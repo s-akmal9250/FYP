@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Asrama Pelajar - Student Dormitory Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS resets and variables */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+        }
+
+        :root {
+            --bg-color: #f4f7fd;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #3b82f6;
+            --primary-grad: linear-gradient(135deg, #818cf8, #3b82f6);
+            --border-color: #e2e8f0;
+            --shadow-subtle: 0 10px 30px rgba(0, 0, 0, 0.02);
+            --shadow-active: 0 15px 35px rgba(59, 130, 246, 0.1);
+            --status-green-bg: #e8f7f0;
+            --status-green-text: #10b981;
+            --btn-back-bg: #e0e7ff;
+            --btn-back-text: #4f46e5;
+        }
+
+        /* Dark mode variables */
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow-subtle: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --shadow-active: 0 15px 35px rgba(99, 102, 241, 0.2);
+            --status-green-bg: rgba(16, 185, 129, 0.15);
+            --status-green-text: #34d399;
+            --btn-back-bg: #334155;
+            --btn-back-text: #cbd5e1;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            padding-bottom: 7.5rem; /* Space for sticky footer */
+        }
+
+        /* Container to center and match mobile aspect ratio */
+        .wizard-container {
+            width: 100%;
+            max-width: 480px; 
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Header controls (Dark Theme & Language Toggle) */
+        .header-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .pill-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: 99px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .pill-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        /* Title block */
+        .title-block {
+            margin-top: 0.5rem;
+        }
+
+        .title-block h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .title-block p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Step Indicator */
+        .step-progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--border-color);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-progress-fill {
+            height: 100%;
+            background: var(--primary-grad);
+            width: 33.3%;
+            border-radius: 99px;
+            transition: width 0.4s ease;
+        }
+
+        /* Option cards */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: var(--shadow-subtle);
+            position: relative;
+        }
+
+        .option-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary);
+            border-width: 2px;
+            box-shadow: var(--shadow-active);
+            background-color: rgba(59, 130, 246, 0.02);
+        }
+        
+        [data-theme="dark"] .option-card.selected {
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+
+        .card-left-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .icon-circle {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 1rem;
+            background-color: #eff6ff;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        [data-theme="dark"] .icon-circle {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .card-details h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .card-details .sub-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .card-details .beds-info {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .status-badge {
+            background-color: var(--status-green-bg);
+            color: var(--status-green-text);
+            padding: 0.4rem 0.8rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Sticky Bottom Navigation Bar */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.04);
+            z-index: 100;
+        }
+
+        .bottom-nav-content {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 1.1rem;
+            border-radius: 99px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn.btn-back {
+            background-color: var(--btn-back-bg);
+            color: var(--btn-back-text);
+        }
+
+        .nav-btn.btn-next {
+            background: var(--primary-grad);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Form styling for Step 3 */
+        .registration-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Selected Summary Block in Form step */
+        .summary-box {
+            background-color: rgba(59, 130, 246, 0.05);
+            border: 1px dashed var(--primary);
+            border-radius: 1rem;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .summary-item span:first-child {
+            color: var(--text-muted);
+        }
+
+        .summary-item span:last-child {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Success screen card */
+        .success-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 2rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .success-icon {
+            width: 5rem;
+            height: 5rem;
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .qr-placeholder {
+            width: 160px;
+            height: 160px;
+            background-color: #ffffff;
+            border: 8px solid var(--border-color);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .qr-placeholder i {
+            font-size: 6rem;
+            color: #1e293b;
+        }
+        
+        .success-card h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        /* Hide elements helper */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wizard-container">
+        <!-- Top header toggles -->
+        <div class="header-controls">
+            <!-- =========================================================================
+                 [KONEKSI ADMIN] - BUTTON UNTUK MASUK KE ADMIN DASHBOARD (admin.html)
+                 Salin bahagian ini ke index.html yang baru jika ingin digabungkan
+                 ========================================================================= -->
+            <a href="admin.html" class="pill-btn" style="text-decoration: none;">
+                <i class="fas fa-user-shield"></i> <span id="admin-text">Warden Portal</span>
+            </a>
+            <!-- ========================================================================= -->
+            <button class="pill-btn" id="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i> <span id="theme-text">Dark Theme</span>
+            </button>
+            <button class="pill-btn" id="lang-toggle" onclick="toggleLanguage()">
+                <i class="fas fa-globe"></i> <span id="lang-text">Melayu</span>
+            </button>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="step-progress-bar" id="progress-bar-container">
+            <div class="step-progress-fill" id="progress-fill"></div>
+        </div>
+
+        <!-- Main Title Area -->
+        <div class="title-block" id="title-area">
+            <h1 id="main-title">Select Eligible Block</h1>
+            <p id="main-desc">Select a room block for your assignment.</p>
+        </div>
+
+        <!-- STEP 1: Select Block -->
+        <div class="options-list" id="step1-container">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- STEP 2: Choose Room -->
+        <div class="options-list hidden" id="step2-container">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- STEP 3: Student Details Form -->
+        <div class="hidden" id="step3-container">
+            <div class="registration-form">
+                <div class="form-group">
+                    <label class="form-label" id="label-name">Full Name</label>
+                    <input type="text" id="student-name" class="form-input" placeholder="Ahmad Fauzi">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-matric">Matric Number</label>
+                    <input type="text" id="student-matric" class="form-input" placeholder="SX210982">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-email">Email Address</label>
+                    <input type="email" id="student-email" class="form-input" placeholder="ahmad@example.com">
+                </div>
+                
+                <!-- Selected summary inside form -->
+                <div class="summary-box">
+                    <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;" id="box-summary-title">Selection Summary</h4>
+                    <div class="summary-item">
+                        <span id="summary-lbl-block">Selected Block</span>
+                        <span id="summary-val-block">Block A</span>
+                    </div>
+                    <div class="summary-item">
+                        <span id="summary-lbl-room">Selected Room</span>
+                        <span id="summary-val-room">Room A205</span>
+                    </div>
+                    <div class="summary-item">
+                        <span id="summary-lbl-beds">Beds Capacity</span>
+                        <span id="summary-val-beds">6 Beds</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Success Screen -->
+        <div class="hidden" id="step4-container">
+            <div class="success-card">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 id="success-header">Room Registered!</h2>
+                
+                <!-- Success details -->
+                <div style="text-align: left; width: 100%; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 1rem 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div class="summary-item">
+                        <span id="success-lbl-name">Student Name:</span>
+                        <span id="success-val-name">Ahmad Fauzi</span>
+                    </div>
+                    <div class="summary-item">
+                        <span id="success-lbl-matric">Matric ID:</span>
+                        <span id="success-val-matric">SX210982</span>
+                    </div>
+                    <div class="summary-item">
+                        <span id="success-lbl-block">Block:</span>
+                        <span id="success-val-block-final">Block A</span>
+                    </div>
+                    <div class="summary-item">
+                        <span id="success-lbl-room">Your Room:</span>
+                        <span id="success-val-room-final">Room A205</span>
+                    </div>
+                </div>
+
+                <div class="qr-placeholder">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                
+                <div>
+                    <h4 style="font-weight: 700; margin-bottom: 0.25rem;" id="success-lbl-code">Digital Key Access Code</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);" id="success-val-desc">Scan this QR code at the room entrance lock.</p>
+                </div>
+                
+                <div style="display: flex; gap: 0.75rem; width: 100%; margin-top: 0.5rem;">
+                    <button class="pill-btn" style="flex: 1; justify-content: center;" onclick="window.print()" id="btn-print"><i class="fas fa-print"></i> Cetak Resit</button>
+                    <button class="pill-btn" style="flex: 1; justify-content: center; background: var(--primary); color: white;" onclick="resetWizard()" id="btn-home"><i class="fas fa-home"></i> Utama</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Sticky Bottom Navigation Bar -->
+    <div class="bottom-nav-bar" id="footer-nav">
+        <div class="bottom-nav-content">
+            <button class="nav-btn btn-back" id="back-btn" onclick="goBack()" disabled>
+                <i class="fas fa-arrow-left"></i> <span id="back-text">Back</span>
+            </button>
+            <button class="nav-btn btn-next" id="next-btn" onclick="goNext()" disabled>
+                <span id="next-text">Next</span> <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // State variables
+        let currentStep = 1;
+        let selectedBlockId = null;
+        let selectedRoomId = null;
+        let currentLanguage = 'en'; // default English
+        let currentTheme = 'light';
+
+        // Translations Dictionary
+        const translations = {
+            en: {
+                adminPortal: "Warden Portal",
+                themeLight: "Light Theme",
+                themeDark: "Dark Theme",
+                langMelayu: "Melayu",
+                langEnglish: "English",
+                back: "Back",
+                next: "Next",
+                confirm: "Confirm",
+                step1Title: "Select Eligible Block",
+                step1Desc: "Select a room block for your assignment.",
+                step2Title: "Choose Room",
+                step2Desc: "Pick a room with at least one available bed.",
+                maleOnly: "Male Only",
+                femaleOnly: "Female Only",
+                step3Title: "Student Information",
+                step3Desc: "Please enter your details to finalize your dorm registration.",
+                step4Title: "Registration Success",
+                step4Desc: "Your room assignment has been registered successfully.",
+                available: "Available",
+                bedsAvailable: "Beds Available",
+                bedsOccupied: "Beds Occupied",
+                roomRange: "Room range",
+                fullnameLabel: "Full Name",
+                fullnamePlaceholder: "e.g. Ahmad Fauzi",
+                matricLabel: "Matric Number",
+                matricPlaceholder: "e.g. SX210982",
+                emailLabel: "Email Address",
+                emailPlaceholder: "e.g. ahmad@example.com",
+                summaryTitle: "Selection Summary",
+                summaryBlock: "Selected Block",
+                summaryRoom: "Selected Room",
+                summaryBeds: "Beds Capacity",
+                successMainMsg: "Room Registered!",
+                successRoomLabel: "Your Room:",
+                successMatricLabel: "Matric ID:",
+                successBlockLabel: "Block:",
+                successAccessCode: "Digital Key Access Code",
+                successAccessDesc: "Scan this QR code at the room entrance lock.",
+                successHomeBtn: "Back to Home",
+                successPrintBtn: "Print Receipt"
+            },
+            ms: {
+                adminPortal: "Portal Warden",
+                themeLight: "Mod Terang",
+                themeDark: "Mod Gelap",
+                langMelayu: "English",
+                langEnglish: "Melayu",
+                back: "Kembali",
+                next: "Seterusnya",
+                confirm: "Sahkan",
+                step1Title: "Pilih Blok Asrama",
+                step1Desc: "Pilih blok bilik asrama untuk pendaftaran anda.",
+                step2Title: "Pilih Bilik",
+                step2Desc: "Pilih bilik yang mempunyai sekurang-kurangnya satu katil kosong.",
+                maleOnly: "Lelaki Sahaja",
+                femaleOnly: "Perempuan Sahaja",
+                step3Title: "Maklumat Pelajar",
+                step3Desc: "Sila masukkan butiran anda untuk melengkapkan pendaftaran bilik.",
+                step4Title: "Pendaftaran Berjaya",
+                step4Desc: "Pendaftaran bilik asrama anda telah berjaya direkodkan.",
+                available: "Tersedia",
+                bedsAvailable: "Katil Tersedia",
+                bedsOccupied: "Katil Terisi",
+                roomRange: "Julat bilik",
+                fullnameLabel: "Nama Penuh",
+                fullnamePlaceholder: "cth. Ahmad Fauzi",
+                matricLabel: "Nombor Matrik",
+                matricPlaceholder: "cth. SX210982",
+                emailLabel: "Alamat E-mel",
+                emailPlaceholder: "cth. ahmad@example.com",
+                summaryTitle: "Ringkasan Pilihan",
+                summaryBlock: "Blok Terpilih",
+                summaryRoom: "Bilik Terpilih",
+                summaryBeds: "Kapasiti Katil",
+                successMainMsg: "Pendaftaran Selesai!",
+                successRoomLabel: "Bilik Anda:",
+                successMatricLabel: "No. Matrik:",
+                successBlockLabel: "Blok:",
+                successAccessCode: "Kod Akses Kunci Digital",
+                successAccessDesc: "Imbas kod QR ini di kunci pintu masuk bilik.",
+                successHomeBtn: "Kembali ke Utama",
+                successPrintBtn: "Cetak Resit"
+            }
+        };
+
+        // Data arrays matching statistics in screenshots
+        const blocks = [
+            { id: 'a1', name: 'Block A', range: '101 - 166', beds: 395, gender: 'male' },
+            { id: 'b1', name: 'Block B', range: '101 - 166', beds: 393, gender: 'male' },
+            { id: 'c1', name: 'Block C', range: '101 - 140', beds: 240, gender: 'female' }
+        ];
+
+        // Generate rooms dynamically
+        const roomsDatabase = {
+            'a1': Array.from({length: 66}, (_, i) => ({
+                id: `A1${(i+1).toString().padStart(2, '0')}`,
+                name: `Room A1${(i+1).toString().padStart(2, '0')}`,
+                capacity: 6,
+                occupied: i === 7 ? 1 : 0
+            })),
+            'b1': Array.from({length: 66}, (_, i) => ({
+                id: `B1${(i+1).toString().padStart(2, '0')}`,
+                name: `Room B1${(i+1).toString().padStart(2, '0')}`,
+                capacity: 6,
+                occupied: i === 1 ? 1 : i === 2 ? 2 : 0
+            })),
+            'c1': Array.from({length: 40}, (_, i) => ({
+                id: `C1${(i+1).toString().padStart(2, '0')}`,
+                name: `Room C1${(i+1).toString().padStart(2, '0')}`,
+                capacity: 6,
+                occupied: 0
+            }))
+        };
+
+        // On Load initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBlocks();
+            updateStepView();
+            updateTranslations();
+        });
+
+        // Step Rendering: Step 1 (Blocks)
+        function renderBlocks() {
+            const container = document.getElementById('step1-container');
+            container.innerHTML = '';
+            
+            blocks.forEach(block => {
+                const isSelected = selectedBlockId === block.id;
+                const card = document.createElement('div');
+                card.className = `option-card ${isSelected ? 'selected' : ''}`;
+                card.onclick = () => selectBlock(block.id);
+                
+                const genderLabel = block.gender === 'male' ? getTranslation('maleOnly') : getTranslation('femaleOnly');
+                const genderStyle = block.gender === 'male' 
+                    ? 'background: rgba(59, 130, 246, 0.1); color: var(--primary);' 
+                    : 'background: rgba(236, 72, 153, 0.1); color: var(--secondary);';
+
+                card.innerHTML = `
+                    <div class="card-left-section">
+                        <div class="icon-circle">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="card-details">
+                            <h3 style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                ${block.name}
+                                <span style="font-size: 0.7rem; font-weight: 500; padding: 0.15rem 0.5rem; border-radius: 99px; ${genderStyle}">
+                                    ${genderLabel}
+                                </span>
+                            </h3>
+                            <span class="sub-info">${getTranslation('roomRange')} ${block.range}</span>
+                            <span class="beds-info">${block.beds} ${getTranslation('bedsAvailable')}</span>
+                        </div>
+                    </div>
+                    <span class="status-badge">${getTranslation('available')}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Step Rendering: Step 2 (Rooms)
+        function renderRooms(blockId) {
+            const container = document.getElementById('step2-container');
+            container.innerHTML = '';
+            
+            const rooms = roomsDatabase[blockId] || [];
+            rooms.forEach(room => {
+                const isSelected = selectedRoomId === room.id;
+                const availableBeds = room.capacity - room.occupied;
+                
+                const card = document.createElement('div');
+                card.className = `option-card ${isSelected ? 'selected' : ''}`;
+                card.onclick = () => selectRoom(room.id);
+                
+                card.innerHTML = `
+                    <div class="card-left-section">
+                        <div class="icon-circle">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <div class="card-details">
+                            <h3>${room.name}</h3>
+                            <span class="sub-info">${room.occupied} / ${room.capacity} ${getTranslation('bedsOccupied')}</span>
+                            <span class="beds-info">${availableBeds} ${getTranslation('bedsAvailable')}</span>
+                        </div>
+                    </div>
+                    <span class="status-badge">${getTranslation('available')}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Selection handlers
+        function selectBlock(id) {
+            selectedBlockId = id;
+            selectedRoomId = null; // reset room selection
+            renderBlocks();
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function selectRoom(id) {
+            selectedRoomId = id;
+            const container = document.getElementById('step2-container');
+            renderRooms(selectedBlockId);
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        // Wizard navigation logic
+        function goNext() {
+            if (currentStep === 1) {
+                currentStep = 2;
+                renderRooms(selectedBlockId);
+                document.getElementById('next-btn').disabled = selectedRoomId === null;
+            } else if (currentStep === 2) {
+                currentStep = 3;
+                populateSummary();
+                checkFormValidity();
+            } else if (currentStep === 3) {
+                if (validateForm()) {
+                    currentStep = 4;
+                    showSuccessScreen();
+                } else {
+                    alert(currentLanguage === 'en' ? 'Please fill in all details.' : 'Sila isi semua maklumat.');
+                    return;
+                }
+            }
+            updateStepView();
+        }
+
+        function goBack() {
+            if (currentStep === 2) {
+                currentStep = 1;
+                document.getElementById('next-btn').disabled = selectedBlockId === null;
+            } else if (currentStep === 3) {
+                currentStep = 2;
+                document.getElementById('next-btn').disabled = selectedRoomId === null;
+            }
+            updateStepView();
+        }
+
+        function updateStepView() {
+            // Toggle containers visibility
+            document.getElementById('step1-container').classList.toggle('hidden', currentStep !== 1);
+            document.getElementById('step2-container').classList.toggle('hidden', currentStep !== 2);
+            document.getElementById('step3-container').classList.toggle('hidden', currentStep !== 3);
+            document.getElementById('step4-container').classList.toggle('hidden', currentStep !== 4);
+            
+            // Progress Bar and Footer Toggles
+            const progressFill = document.getElementById('progress-fill');
+            const backBtn = document.getElementById('back-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const footer = document.getElementById('footer-nav');
+            
+            if (currentStep === 4) {
+                progressFill.style.width = "100%";
+                footer.classList.add('hidden');
+                document.getElementById('progress-bar-container').classList.add('hidden');
+            } else {
+                footer.classList.remove('hidden');
+                document.getElementById('progress-bar-container').classList.remove('hidden');
+                progressFill.style.width = `${(currentStep / 3) * 100}%`;
+            }
+            
+            backBtn.disabled = currentStep === 1;
+            
+            // Text values updates based on step and language
+            updateTitleTexts();
+        }
+
+        // Form monitoring
+        function checkFormValidity() {
+            const name = document.getElementById('student-name').value.trim();
+            const matric = document.getElementById('student-matric').value.trim();
+            const email = document.getElementById('student-email').value.trim();
+            
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = !(name && matric && email);
+        }
+
+        // Register form inputs listeners
+        document.getElementById('student-name').addEventListener('input', checkFormValidity);
+        document.getElementById('student-matric').addEventListener('input', checkFormValidity);
+        document.getElementById('student-email').addEventListener('input', checkFormValidity);
+
+        function validateForm() {
+            const name = document.getElementById('student-name').value.trim();
+            const matric = document.getElementById('student-matric').value.trim();
+            const email = document.getElementById('student-email').value.trim();
+            return name.length > 0 && matric.length > 0 && email.includes('@');
+        }
+
+        // Populate details summary box in Step 3
+        function populateSummary() {
+            const blockObj = blocks.find(b => b.id === selectedBlockId);
+            
+            document.getElementById('summary-val-block').textContent = blockObj ? blockObj.name : '';
+            document.getElementById('summary-val-room').textContent = selectedRoomId || '';
+            document.getElementById('summary-val-beds').textContent = '6 Beds / Katil';
+        }
+
+        // Show final success assignment details
+        function showSuccessScreen() {
+            const blockObj = blocks.find(b => b.id === selectedBlockId);
+            
+            document.getElementById('success-val-name').textContent = document.getElementById('student-name').value;
+            document.getElementById('success-val-matric').textContent = document.getElementById('student-matric').value;
+            document.getElementById('success-val-block-final').textContent = blockObj ? blockObj.name : '';
+            document.getElementById('success-val-room-final').textContent = selectedRoomId;
+        }
+
+        // Reset wizard back to block selection
+        function resetWizard() {
+            currentStep = 1;
+            selectedBlockId = null;
+            selectedRoomId = null;
+            document.getElementById('student-name').value = '';
+            document.getElementById('student-matric').value = '';
+            document.getElementById('student-email').value = '';
+            
+            renderBlocks();
+            updateStepView();
+        }
+
+        // Theme and language toggle functions
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                currentTheme = 'light';
+                document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-moon"></i> <span id="theme-text">' + getTranslation('themeDark') + '</span>';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                currentTheme = 'dark';
+                document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-sun"></i> <span id="theme-text">' + getTranslation('themeLight') + '</span>';
+            }
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ms' : 'en';
+            
+            // Re-render blocks or rooms to update internal card translations
+            if (currentStep === 1) renderBlocks();
+            if (currentStep === 2) renderRooms(selectedBlockId);
+            if (currentStep === 3) populateSummary();
+            
+            updateTranslations();
+            updateTitleTexts();
+        }
+
+        function updateTranslations() {
+            // Toggles text
+            document.getElementById('admin-text').textContent = getTranslation('adminPortal');
+            document.getElementById('lang-text').textContent = getTranslation('langMelayu');
+            document.getElementById('theme-text').textContent = currentTheme === 'light' ? getTranslation('themeDark') : getTranslation('themeLight');
+            
+            // Buttons
+            document.getElementById('back-text').textContent = getTranslation('back');
+            
+            // Labels
+            document.getElementById('label-name').textContent = getTranslation('fullnameLabel');
+            document.getElementById('label-matric').textContent = getTranslation('matricLabel');
+            document.getElementById('label-email').textContent = getTranslation('emailLabel');
+            
+            // Inputs placeholders
+            document.getElementById('student-name').placeholder = getTranslation('fullnamePlaceholder');
+            document.getElementById('student-matric').placeholder = getTranslation('matricPlaceholder');
+            document.getElementById('student-email').placeholder = getTranslation('emailPlaceholder');
+            
+            // Box summary labels
+            document.getElementById('box-summary-title').textContent = getTranslation('summaryTitle');
+            document.getElementById('summary-lbl-block').textContent = getTranslation('summaryBlock');
+            document.getElementById('summary-lbl-room').textContent = getTranslation('summaryRoom');
+            document.getElementById('summary-lbl-beds').textContent = getTranslation('summaryBeds');
+            
+            // Success details labels
+            document.getElementById('success-header').textContent = getTranslation('successMainMsg');
+            document.getElementById('success-lbl-name').textContent = getTranslation('fullnameLabel') + ':';
+            document.getElementById('success-lbl-matric').textContent = getTranslation('successMatricLabel');
+            document.getElementById('success-lbl-block').textContent = getTranslation('successBlockLabel');
+            document.getElementById('success-lbl-room').textContent = getTranslation('successRoomLabel');
+            document.getElementById('success-lbl-code').textContent = getTranslation('successAccessCode');
+            document.getElementById('success-val-desc').textContent = getTranslation('successAccessDesc');
+            
+            document.getElementById('btn-print').innerHTML = `<i class="fas fa-print"></i> ${getTranslation('successPrintBtn')}`;
+            document.getElementById('btn-home').innerHTML = `<i class="fas fa-home"></i> ${getTranslation('successHomeBtn')}`;
+        }
+
+        function updateTitleTexts() {
+            const nextTextSpan = document.getElementById('next-text');
+            
+            if (currentStep === 1) {
+                document.getElementById('main-title').textContent = getTranslation('step1Title');
+                document.getElementById('main-desc').textContent = getTranslation('step1Desc');
+                nextTextSpan.textContent = getTranslation('next');
+            } else if (currentStep === 2) {
+                document.getElementById('main-title').textContent = getTranslation('step2Title');
+                document.getElementById('main-desc').textContent = getTranslation('step2Desc');
+                nextTextSpan.textContent = getTranslation('next');
+            } else if (currentStep === 3) {
+                document.getElementById('main-title').textContent = getTranslation('step3Title');
+                document.getElementById('main-desc').textContent = getTranslation('step3Desc');
+                nextTextSpan.textContent = getTranslation('confirm');
+            }
+        }
+
+        // Helper to get active translation value
+        function getTranslation(key) {
+            return translations[currentLanguage][key] || translations['en'][key] || '';
+        }
+    </script>
+
+</body>
+</html>

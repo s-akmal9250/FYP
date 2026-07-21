@@ -1,0 +1,3178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHMaaS Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f1f5f9;
+            --white: #ffffff;
+            --gray: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: var(--dark);
+        }
+
+        .admin-container {
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--dark);
+            color: var(--white);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+            padding-right: 0.25rem;
+            /* Hide scrollbars */
+            scrollbar-width: none;
+        }
+        .sidebar-menu::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .sidebar-header span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--gray);
+            font-weight: 400;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            position: relative;
+            width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .btn-icon:hover {
+            background: var(--light);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon.blue { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .stat-icon.purple { background: rgba(236, 72, 153, 0.1); color: var(--secondary); }
+
+        .stat-trend {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .stat-trend.up { color: var(--success); }
+        .stat-trend.down { color: var(--danger); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-sm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary-sm:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray);
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        td {
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .guest-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .guest-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .guest-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .guest-email {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status.checked-in {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .status.checked-out {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--gray);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--gray);
+        }
+
+        .btn-action:hover {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* Activity List */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: var(--light);
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: #e2e8f0;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.check-in { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .activity-icon.check-out { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .activity-icon.booking { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+
+        .activity-content h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-content p {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .activity-time {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        /* Charts Placeholder */
+        .chart-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* View switching visibility */
+        .dashboard-view {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .dashboard-view.active-view {
+            display: block !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Header Layout */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            margin-top: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* Tabs and Controls */
+        .view-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: #cbd5e1;
+            padding: 0.25rem;
+            border-radius: 0.75rem;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: transparent;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Room Grid Styles */
+        .rooms-summary {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .summary-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: white;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .room-card-admin {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .room-card-admin:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .room-card-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-number-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .room-card-body {
+            padding: 1.25rem;
+        }
+
+        .room-type-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .room-price-admin {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .room-amenities {
+            display: flex;
+            gap: 0.75rem;
+            color: var(--gray);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .room-card-footer {
+            padding: 1rem 1.25rem;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Status colors for Room cards */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-badge.available { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-badge.occupied { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .status-badge.maintenance { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .status-badge.cleaning { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+
+        /* Staff Grid Styles */
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .staff-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #f1f5f9;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .staff-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .staff-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+        }
+
+        .staff-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .staff-role {
+            font-size: 0.875rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .staff-status-dot {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .staff-status-dot.active { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .staff-status-dot.inactive { background: rgba(100, 116, 139, 0.1); color: var(--gray); }
+
+        .staff-contact {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 1rem;
+        }
+
+        /* Settings Layout */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 2rem;
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #f1f5f9;
+        }
+
+        .settings-sidebar {
+            border-right: 1px solid #f1f5f9;
+            padding-right: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .settings-tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: transparent;
+            color: var(--gray);
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .settings-tab-btn:hover, .settings-tab-btn.active {
+            background: rgba(99, 102, 241, 0.05);
+            color: var(--primary);
+        }
+
+        .settings-content-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-content-pane.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.75rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--dark);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Analytics Custom Grids */
+        .analytics-charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .analytics-charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+            .settings-sidebar {
+                border-right: none;
+                border-bottom: 1px solid #f1f5f9;
+                padding-right: 0;
+                padding-bottom: 1rem;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+        }
+
+        /* SVG Charts Styling */
+        .chart-svg {
+            width: 100%;
+            height: 220px;
+        }
+
+        .chart-bar-rect {
+            fill: var(--primary);
+            rx: 4;
+            transition: height 0.5s ease, y 0.5s ease;
+        }
+        .chart-bar-rect:hover {
+            fill: var(--primary-dark);
+        }
+
+        .chart-line-path {
+            fill: none;
+            stroke: var(--secondary);
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        /* Dialog/Modal Styling */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .admin-modal-content {
+            background: white;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes modalSlideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .modal-close-btn:hover {
+            color: var(--danger);
+        }
+
+        /* Language Switcher Styling */
+        .lang-switcher {
+            display: inline-flex;
+            background: #f1f5f9;
+            padding: 0.25rem;
+            border-radius: 0.75rem;
+            gap: 0.25rem;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: var(--dark);
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .lang-btn .flag-icon {
+            font-size: 1rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-hotel"></i>
+                <div>
+                    <h1>SHMaaS</h1>
+                    <span data-translate="sub_title">Pengurusan Asrama</span>
+                </div>
+            </div>
+
+            <!-- Scrollable Sidebar Menu items -->
+            <div class="sidebar-menu">
+                <div class="nav-section">
+                    <div class="nav-title" data-translate="nav_main">Utama</div>
+                    <div class="nav-item active" onclick="showSection('dashboard')">
+                        <i class="fas fa-home"></i>
+                        <span data-translate="nav_dashboard">Panel Kawalan</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('bookings')">
+                        <i class="fas fa-calendar-check"></i>
+                        <span data-translate="nav_bookings">Pendaftaran Bilik</span>
+                        <span class="badge">12</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('guests')">
+                        <i class="fas fa-users"></i>
+                        <span data-translate="nav_students">Direktori Pelajar</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('rooms')">
+                        <i class="fas fa-bed"></i>
+                        <span data-translate="nav_rooms">Bilik Asrama</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-title" data-translate="nav_mgmt">Pengurusan</div>
+                    <div class="nav-item" onclick="showSection('analytics')">
+                        <i class="fas fa-chart-line"></i>
+                        <span data-translate="nav_analytics">Analisis Asrama</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('staff')">
+                        <i class="fas fa-user-tie"></i>
+                        <span data-translate="nav_staff">Pengurusan Warden</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('settings')">
+                        <i class="fas fa-cog"></i>
+                        <span data-translate="nav_settings">Tetapan Sistem</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fixed Sidebar Footer items -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">AI</div>
+                    <div class="user-info">
+                        <h4>Azman Ibrahim</h4>
+                        <p>admin@shmaas.com</p>
+                    </div>
+                </div>
+
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> <span data-translate="logout">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" data-translate-placeholder="search_placeholder" placeholder="Cari pendaftaran, pelajar, bilik...">
+                </div>
+                <div class="top-actions">
+                    <div class="lang-switcher">
+                        <button class="lang-btn active" id="btn-lang-ms" onclick="setLanguage('ms')" title="Bahasa Melayu">
+                            <span class="flag-icon">🇲🇾</span> <span class="lang-label">Melayu</span>
+                        </button>
+                        <button class="lang-btn" id="btn-lang-en" onclick="setLanguage('en')" title="English">
+                            <span class="flag-icon">🇬🇧</span> <span class="lang-label">English</span>
+                        </button>
+                    </div>
+                    <button class="btn-icon">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <button class="btn-icon">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                    <button class="btn-icon" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="dashboard-view active-view">
+                <!-- Warden Attention Banner -->
+                <div class="warden-notice-banner" style="background: rgba(245, 158, 11, 0.1); border-left: 5px solid #f59e0b; padding: 1rem 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
+                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.5rem;"></i>
+                    <div style="flex: 1;">
+                        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: #d97706;">Peringatan Warden (Semester Akhir Bulan Ke-5)</h4>
+                        <p style="font-size: 0.85rem; color: #b45309; line-height: 1.4;">
+                            Kitaran asrama telah memasuki fasa pemulangan bilik. Pelajar biasa dijadualkan pulang minggu ini. Sila jalankan pemeriksaan bilik bagi tuntutan deposit/kunci dan kemas kini status bilik kepada <strong>Pembersihan</strong>.
+                        </p>
+                    </div>
+                    <span style="font-size: 0.75rem; background: #f59e0b; color: white; padding: 0.25rem 0.5rem; border-radius: 99px; font-weight: 600;">Penting</span>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon blue">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                            <span class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i> 12%
+                            </span>
+                        </div>
+                        <div class="stat-value">85%</div>
+                        <div class="stat-label" data-translate="stat_occupancy">Kadar Penghunian</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon green">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <span class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i> 8%
+                            </span>
+                        </div>
+                        <div class="stat-value">RM 12.4k</div>
+                        <div class="stat-label" data-translate="stat_fees">Kutipan Yuran Bulan Ini</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon orange">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <span class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i> 24%
+                            </span>
+                        </div>
+                        <div class="stat-value">156</div>
+                        <div class="stat-label" data-translate="stat_active">Pendaftaran Aktif</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon purple">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <span class="stat-trend up">
+                                <i class="fas fa-arrow-up"></i> 5%
+                            </span>
+                        </div>
+                        <div class="stat-value">260</div>
+                        <div class="stat-label" data-translate="stat_beds">Katil Tersedia</div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Recent Bookings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title" data-translate="recent_bookings_title">Pendaftaran Terbaharu</h3>
+                            <button class="btn-sm btn-primary-sm" onclick="showSection('bookings')" data-translate="btn_all">Semua</button>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th data-translate="th_student">Pelajar</th>
+                                        <th data-translate="th_block_room">Blok & Bilik</th>
+                                        <th data-translate="th_session_date">Tarikh Sesi</th>
+                                        <th data-translate="th_status">Status</th>
+                                        <th data-translate="th_action">Tindakan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="guest-info">
+                                                <div class="guest-avatar">AF</div>
+                                                <div>
+                                                    <div class="guest-name">Ahmad Fauzi</div>
+                                                    <div class="guest-email">ahmad@example.com</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Blok A - A204</td>
+                                        <td>Mar 15-18, 2026</td>
+                                        <td><span class="status checked-in" data-translate="status_active">Aktif</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn-action" onclick="showSection('bookings')"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="guest-info">
+                                                <div class="guest-avatar" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">SA</div>
+                                                <div>
+                                                    <div class="guest-name">Siti Aminah</div>
+                                                    <div class="guest-email">siti@example.com</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Blok C - C105</td>
+                                        <td>Mar 16-20, 2026</td>
+                                        <td><span class="status pending" data-translate="status_pending">Menunggu</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn-action" onclick="showSection('bookings')"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="guest-info">
+                                                <div class="guest-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6);">TH</div>
+                                                <div>
+                                                    <div class="guest-name">Taufik Hidayat</div>
+                                                    <div class="guest-email">taufik@example.com</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Blok B - B102</td>
+                                        <td>Mar 14-17, 2026</td>
+                                        <td><span class="status checked-out" data-translate="status_completed">Selesai</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn-action" onclick="showSection('bookings')"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="guest-info">
+                                                <div class="guest-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">NI</div>
+                                                <div>
+                                                    <div class="guest-name">Nurul Izzah</div>
+                                                    <div class="guest-email">nurul@example.com</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Blok C - C501</td>
+                                        <td>Mar 18-25, 2026</td>
+                                        <td><span class="status pending" data-translate="status_pending">Menunggu</span></td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="btn-action" onclick="showSection('bookings')"><i class="fas fa-eye"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title" data-translate="recent_activity_title">Recent Activity</h3>
+                            <button class="btn-sm btn-primary-sm" data-translate="btn_view_all">View All</button>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon check-in">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4 data-translate="activity_checkin">Check-in</h4>
+                                    <p data-translate="act_fauzi_in">Ahmad Fauzi checked into Room 204</p>
+                                </div>
+                                <span class="activity-time" data-translate="time_2m">2 min ago</span>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon booking">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4 data-translate="activity_new_booking">New Booking</h4>
+                                    <p data-translate="act_aminah_book">Siti Aminah booked Room 105</p>
+                                </div>
+                                <span class="activity-time" data-translate="time_15m">15 min ago</span>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon check-out">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4 data-translate="activity_checkout">Check-out</h4>
+                                    <p data-translate="act_taufik_out">Taufik Hidayat checked out from Dorm 4B</p>
+                                </div>
+                                <span class="activity-time" data-translate="time_1h">1 hour ago</span>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon booking">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4 data-translate="activity_new_review">New Review</h4>
+                                    <p data-translate="act_izzah_review">Nurul Izzah left a 5-star review</p>
+                                </div>
+                                <span class="activity-time" data-translate="time_3h">3 hours ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Chart -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <h3 class="card-title" data-translate="occupancy_overview_title">Occupancy Overview</h3>
+                        <select style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+                            <option data-translate="opt_7_days">Last 7 Days</option>
+                            <option data-translate="opt_30_days">Last 30 Days</option>
+                            <option data-translate="opt_this_year">This Year</option>
+                        </select>
+                    </div>
+                    <div class="chart-placeholder">
+                        <div style="text-align: center;">
+                            <i class="fas fa-chart-bar" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <p data-translate="chart_interactive">Interactive Chart Visualization</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bookings View -->
+            <div id="bookings-view" class="dashboard-view">
+                <div class="section-header">
+                    <h2 class="section-title" data-translate="bookings_title">Pengurusan Pendaftaran Bilik</h2>
+                    <button class="btn-primary" onclick="openAdminModal('booking')">
+                        <i class="fas fa-plus"></i> <span data-translate="btn_add_booking">Tambah Pendaftaran</span>
+                    </button>
+                </div>
+                
+                <div class="view-controls">
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" onclick="filterBookings('all')" data-translate="btn_all">Semua</button>
+                        <button class="filter-tab" onclick="filterBookings('checked-in')" data-translate="status_active">Aktif</button>
+                        <button class="filter-tab" onclick="filterBookings('pending')" data-translate="status_pending">Menunggu</button>
+                        <button class="filter-tab" onclick="filterBookings('checked-out')" data-translate="status_completed">Selesai</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table id="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th data-translate="th_reg_id">ID Daftar</th>
+                                    <th data-translate="th_student">Pelajar</th>
+                                    <th data-translate="th_block_room">Blok & Bilik</th>
+                                    <th data-translate="th_session_date">Tarikh Sesi</th>
+                                    <th data-translate="th_fees_paid">Yuran (RM)</th>
+                                    <th data-translate="th_status">Status</th>
+                                    <th data-translate="th_action">Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-status="checked-in">
+                                    <td><strong>#BK-1002</strong></td>
+                                    <td>
+                                        <div class="guest-info">
+                                            <div class="guest-avatar">AF</div>
+                                            <div>
+                                                <div class="guest-name">Ahmad Fauzi</div>
+                                                <div class="guest-email">ahmad@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Blok A - A204</td>
+                                    <td>Jun 01 - Nov 01, 2026</td>
+                                    <td>RM 50.00</td>
+                                    <td><span class="status checked-in" data-translate="status_active">Aktif</span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-action" title="Lihat"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-action" title="Daftar Keluar" onclick="updateBookingStatus(this, 'checked-out')"><i class="fas fa-sign-out-alt"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-status="pending">
+                                    <td><strong>#BK-1003</strong></td>
+                                    <td>
+                                        <div class="guest-info">
+                                            <div class="guest-avatar" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">SA</div>
+                                            <div>
+                                                <div class="guest-name">Siti Aminah</div>
+                                                <div class="guest-email">siti@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Blok C - C105</td>
+                                    <td>Jun 01 - Nov 01, 2026</td>
+                                    <td>RM 50.00</td>
+                                    <td><span class="status pending" data-translate="status_pending">Menunggu</span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-action" title="Sahkan Daftar Masuk" onclick="updateBookingStatus(this, 'checked-in')"><i class="fas fa-check"></i></button>
+                                            <button class="btn-action" title="Batal" onclick="deleteBookingRow(this)"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-status="checked-out">
+                                    <td><strong>#BK-1001</strong></td>
+                                    <td>
+                                        <div class="guest-info">
+                                            <div class="guest-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6);">TH</div>
+                                            <div>
+                                                <div class="guest-name">Taufik Hidayat</div>
+                                                <div class="guest-email">taufik@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Blok B - B102</td>
+                                    <td>Dec 01, 2025 - May 01, 2026</td>
+                                    <td>RM 50.00</td>
+                                    <td><span class="status checked-out" data-translate="status_completed">Selesai</span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-action" title="Daftar Semula"><i class="fas fa-redo"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-status="pending">
+                                    <td><strong>#BK-1004</strong></td>
+                                    <td>
+                                        <div class="guest-info">
+                                            <div class="guest-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">NI</div>
+                                            <div>
+                                                <div class="guest-name">Nurul Izzah</div>
+                                                <div class="guest-email">nurul@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Blok C - C501</td>
+                                    <td>Jun 01 - Nov 01, 2026</td>
+                                    <td>RM 50.00</td>
+                                    <td><span class="status pending" data-translate="status_pending">Menunggu</span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-action" title="Sahkan Daftar Masuk" onclick="updateBookingStatus(this, 'checked-in')"><i class="fas fa-check"></i></button>
+                                            <button class="btn-action" title="Batal" onclick="deleteBookingRow(this)"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guests View -->
+            <div id="guests-view" class="dashboard-view">
+                <div class="section-header">
+                    <h2 class="section-title" data-translate="guests_title">Direktori Pelajar</h2>
+                    <button class="btn-primary" onclick="openAdminModal('guest')">
+                        <i class="fas fa-user-plus"></i> <span data-translate="btn_add_guest">Tambah Pelajar Baharu</span>
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table id="guests-table">
+                            <thead>
+                                <tr>
+                                    <th data-translate="th_student_id">ID Pelajar</th>
+                                    <th data-translate="th_name">Nama</th>
+                                    <th data-translate="th_contact">Maklumat Hubungan</th>
+                                    <th data-translate="th_study_year">Tahun Pengajian</th>
+                                    <th data-translate="th_fees_paid">Yuran Dibayar</th>
+                                    <th data-translate="th_student_status">Status Asrama</th>
+                                    <th data-translate="th_action">Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>#G-2041</strong></td>
+                                    <td>
+                                        <div class="guest-info">
+                                            <div class="guest-avatar">AF</div>
+                                            <div>
+                                                <div class="guest-name">Ahmad Fauzi</div>
+                                                <span class="status-badge available" style="padding: 0.1rem 0.5rem; font-size: 0.65rem;" data-translate="status_active">Aktif</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div><i class="fas fa-envelope" style="color: var(--gray); margin-right: 0.5rem;"></i> ahmad@example.com</div>
+                                        <div style="margin-top: 0.25rem;"><i class="fas fa-phone" style="color: var(--gray); margin-right: 0.5rem;"></i> +1 (555) 019-2834</div>
+                                    </td>
+                                    <td><span data-translate="study_year_1">Semester 1</span></td>
+                                    <td>RM 50.00</td>
+                                    <td><span style="color: var(--success); font-weight: 600;"><i class="fas fa-home"></i> <span data-translate="badge_dorm_wajib">Asrama (Wajib)</span></span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-action" title="Edit Pelajar"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action" style="color: var(--danger);" onclick="deleteTableRow(this)" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>#G-2042</strong></td>
+                                    <td>
+                                        <div class="guest-info">
+                                            <div class="guest-avatar" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">SA</div>
+                                            <div>
+                                                <div class="guest-name">Siti Aminah</div>
+                                                <span class="status-badge available" style="padding: 0.1rem 0.5rem; font-size: 0.65rem;" data-translate="status_active">Aktif</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div><i class="fas fa-envelope" style="color: var(--gray); margin-right: 0.5rem;"></i> siti@example.com</div>
+                                        <div style="margin-top: 0.25rem;"><i class="fas fa-phone" style="color: var(--gray); margin-right: 0.5rem;"></i> +1 (555) 014-9988</div>
+                                    </td>
+                                    <td><span data-translate="study_year_2">Semester 2</span></td>
+                                    <td>RM 50.00</td>
+                                    <td><span style="color: var(--primary); font-weight: 600;"><i class="fas fa-envelope-open-text"></i> <span data-translate="badge_dorm_luar_surat">Luar Asrama (Bersurat)</span></span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-action" title="Edit Pelajar"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action" style="color: var(--danger);" onclick="deleteTableRow(this)" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>#G-2043</strong></td>
+                                    <td>
+                                        <div class="guest-info">
+                                            <div class="guest-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6);">TH</div>
+                                            <div>
+                                                <div class="guest-name">Taufik Hidayat</div>
+                                                <span class="status-badge available" style="padding: 0.1rem 0.5rem; font-size: 0.65rem;" data-translate="status_active">Aktif</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div><i class="fas fa-envelope" style="color: var(--gray); margin-right: 0.5rem;"></i> taufik@example.com</div>
+                                        <div style="margin-top: 0.25rem;"><i class="fas fa-phone" style="color: var(--gray); margin-right: 0.5rem;"></i> +1 (555) 018-7711</div>
+                                    </td>
+                                    <td><span data-translate="study_year_3">Semester 3</span></td>
+                                    <td>RM 50.00</td>
+                                    <td><span style="color: #f59e0b; font-weight: 600;"><i class="fas fa-check-circle"></i> <span data-translate="badge_dorm_pilihan">Asrama (Pilihan)</span></span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-action" title="Edit Pelajar"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action" style="color: var(--danger);" onclick="deleteTableRow(this)" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>#G-2044</strong></td>
+                                    <td>
+                                        <div class="guest-info">
+                                            <div class="guest-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">NI</div>
+                                            <div>
+                                                <div class="guest-name">Nurul Izzah</div>
+                                                <span class="status-badge occupied" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 0.1rem 0.5rem; font-size: 0.65rem;" data-translate="status_active">Aktif</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div><i class="fas fa-envelope" style="color: var(--gray); margin-right: 0.5rem;"></i> nurul@example.com</div>
+                                        <div style="margin-top: 0.25rem;"><i class="fas fa-phone" style="color: var(--gray); margin-right: 0.5rem;"></i> +1 (555) 013-4422</div>
+                                    </td>
+                                    <td><span data-translate="study_year_1">Semester 1</span></td>
+                                    <td>RM 0.00</td>
+                                    <td><span style="color: var(--danger); font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> <span data-translate="badge_dorm_luar_no_surat">Luar Asrama (TIADA SURAT!)</span></span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="btn-action" title="Edit Pelajar"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-action" style="color: var(--danger);" onclick="deleteTableRow(this)" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rooms View -->
+            <div id="rooms-view" class="dashboard-view">
+                <div class="section-header">
+                    <h2 class="section-title" data-translate="rooms_title">Pengurusan Bilik Asrama</h2>
+                    <button class="btn-primary" onclick="openAdminModal('room')">
+                        <i class="fas fa-plus"></i> <span data-translate="btn_add_room">Tambah Bilik</span>
+                    </button>
+                </div>
+
+                <div class="rooms-summary">
+                    <div class="summary-badge"><i class="fas fa-border-all" style="color: var(--primary);"></i> <span data-translate="sum_total_rooms">Jumlah Bilik: 172</span></div>
+                    <div class="summary-badge"><i class="fas fa-check-circle" style="color: var(--success);"></i> <span data-translate="sum_available_rooms">Kosong: 78</span></div>
+                    <div class="summary-badge"><i class="fas fa-bed" style="color: var(--danger);"></i> <span data-translate="sum_occupied_rooms">Penuh: 82</span></div>
+                    <div class="summary-badge"><i class="fas fa-broom" style="color: var(--primary);"></i> <span data-translate="sum_cleaning_rooms">Pembersihan: 8</span></div>
+                    <div class="summary-badge"><i class="fas fa-tools" style="color: var(--warning);"></i> <span data-translate="sum_maintenance_rooms">Penyelenggaraan: 4</span></div>
+                </div>
+
+                <div class="view-controls">
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; width: 100%;">
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" onclick="filterRooms('all', this)" data-translate="btn_all_status">Semua Status</button>
+                            <button class="filter-tab" onclick="filterRooms('available', this)" data-translate="btn_available">Kosong</button>
+                            <button class="filter-tab" onclick="filterRooms('occupied', this)" data-translate="btn_occupied">Penuh</button>
+                            <button class="filter-tab" onclick="filterRooms('cleaning', this)" data-translate="btn_cleaning_tab">Pembersihan</button>
+                            <button class="filter-tab" onclick="filterRooms('maintenance', this)" data-translate="btn_maintenance_tab">Penyelenggaraan</button>
+                        </div>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" onclick="filterRoomsByBlock('all', this)" data-translate="btn_all_blocks">Semua Blok</button>
+                            <button class="filter-tab" onclick="filterRoomsByBlock('A', this)" data-translate="btn_block_a">Blok A</button>
+                            <button class="filter-tab" onclick="filterRoomsByBlock('B', this)" data-translate="btn_block_b">Blok B</button>
+                            <button class="filter-tab" onclick="filterRoomsByBlock('C', this)" data-translate="btn_block_c">Blok C</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rooms-grid" id="rooms-grid">
+                    <!-- Room 101 -->
+                    <div class="room-card-admin" data-type="available" data-block="A">
+                        <div class="room-card-header">
+                            <span class="room-number-title"><span data-translate="room_prefix">Bilik</span> A101 <span style="font-size: 0.75rem; font-weight: normal; color: var(--primary);">(<span data-translate="male">Lelaki</span>)</span></span>
+                            <span class="status-badge available" data-translate="status_available_en">Available</span>
+                        </div>
+                        <div class="room-card-body">
+                            <div class="room-type-label" data-translate="type_single">Single Bed</div>
+                            <div class="room-amenities">
+                                <i class="fas fa-wifi" title="Free Wifi"></i>
+                            </div>
+                        </div>
+                        <div class="room-card-footer">
+                            <span style="font-size: 0.75rem; color: var(--gray);"><i class="fas fa-key"></i> <span data-translate="smart_key_active">Kunci Pintar Aktif</span></span>
+                            <button class="btn-sm btn-primary-sm" style="padding: 0.35rem 0.75rem;" onclick="toggleRoomStatus(this)" data-translate="btn_set_occupied">Set Penuh</button>
+                        </div>
+                    </div>
+                    <!-- Room 105 -->
+                    <div class="room-card-admin" data-type="occupied" data-block="C">
+                        <div class="room-card-header">
+                            <span class="room-number-title"><span data-translate="room_prefix">Bilik</span> C105 <span style="font-size: 0.75rem; font-weight: normal; color: var(--secondary);">(<span data-translate="female">Perempuan</span>)</span></span>
+                            <span class="status-badge occupied" data-translate="btn_occupied">Penuh</span>
+                        </div>
+                        <div class="room-card-body">
+                            <div class="room-type-label" data-translate="type_shared_2">Bilik Kongsi (2 Katil)</div>
+                            <div class="room-amenities">
+                                <i class="fas fa-wifi" title="Free Wifi"></i>
+                            </div>
+                        </div>
+                        <div class="room-card-footer">
+                            <span style="font-size: 0.75rem; color: var(--gray);"><i class="fas fa-user"></i> <span data-translate="lbl_student">Pelajar</span>: Siti Aminah</span>
+                            <button class="btn-sm btn-primary-sm" style="padding: 0.35rem 0.75rem; background: var(--gray);" onclick="toggleRoomStatus(this)" data-translate="btn_set_available">Set Kosong</button>
+                        </div>
+                    </div>
+                    <!-- Room 204 -->
+                    <div class="room-card-admin" data-type="occupied" data-block="A">
+                        <div class="room-card-header">
+                            <span class="room-number-title"><span data-translate="room_prefix">Bilik</span> A204 <span style="font-size: 0.75rem; font-weight: normal; color: var(--primary);">(<span data-translate="male">Lelaki</span>)</span></span>
+                            <span class="status-badge occupied" data-translate="btn_occupied">Penuh</span>
+                        </div>
+                        <div class="room-card-body">
+                            <div class="room-type-label" data-translate="type_shared_4">Bilik Kongsi (4 Katil)</div>
+                            <div class="room-amenities">
+                                <i class="fas fa-wifi" title="Free Wifi"></i>
+                            </div>
+                        </div>
+                        <div class="room-card-footer">
+                            <span style="font-size: 0.75rem; color: var(--gray);"><i class="fas fa-user"></i> <span data-translate="lbl_student">Pelajar</span>: Ahmad Fauzi</span>
+                            <button class="btn-sm btn-primary-sm" style="padding: 0.35rem 0.75rem; background: var(--gray);" onclick="toggleRoomStatus(this)" data-translate="btn_set_available">Set Kosong</button>
+                        </div>
+                    </div>
+                    <!-- Room 302 -->
+                    <div class="room-card-admin" data-type="cleaning" data-block="A">
+                        <div class="room-card-header">
+                            <span class="room-number-title"><span data-translate="room_prefix">Bilik</span> A302 <span style="font-size: 0.75rem; font-weight: normal; color: var(--primary);">(<span data-translate="male">Lelaki</span>)</span></span>
+                            <span class="status-badge cleaning" data-translate="btn_cleaning_tab">Pembersihan</span>
+                        </div>
+                        <div class="room-card-body">
+                            <div class="room-type-label" data-translate="type_single">Single Bed</div>
+                            <div class="room-amenities">
+                                <i class="fas fa-wifi" title="Free Wifi"></i>
+                            </div>
+                        </div>
+                        <div class="room-card-footer">
+                            <span style="font-size: 0.75rem; color: var(--gray);"><i class="fas fa-broom"></i> <span data-translate="lbl_cleaning_work">Kerja Pembersihan</span></span>
+                            <button class="btn-sm btn-primary-sm" style="padding: 0.35rem 0.75rem;" onclick="toggleRoomStatus(this)" data-translate="btn_set_available">Set Kosong</button>
+                        </div>
+                    </div>
+                    <!-- Room 405 -->
+                    <div class="room-card-admin" data-type="maintenance" data-block="B">
+                        <div class="room-card-header">
+                            <span class="room-number-title"><span data-translate="room_prefix">Bilik</span> B405 <span style="font-size: 0.75rem; font-weight: normal; color: var(--primary);">(<span data-translate="male">Lelaki</span>)</span></span>
+                            <span class="status-badge maintenance" data-translate="btn_maintenance_tab">Penyelenggaraan</span>
+                        </div>
+                        <div class="room-card-body">
+                            <div class="room-type-label" data-translate="type_shared_6">Bilik Kongsi (6 Katil)</div>
+                            <div class="room-amenities">
+                                <i class="fas fa-wifi" title="Free Wifi"></i>
+                            </div>
+                        </div>
+                        <div class="room-card-footer">
+                            <span style="font-size: 0.75rem; color: var(--gray);"><i class="fas fa-tools"></i> <span data-translate="lbl_maintenance_work">Penyelenggaraan</span></span>
+                            <button class="btn-sm btn-primary-sm" style="padding: 0.35rem 0.75rem;" onclick="toggleRoomStatus(this)" data-translate="btn_set_available">Set Kosong</button>
+                        </div>
+                    </div>
+                    <!-- Suite 501 -->
+                    <div class="room-card-admin" data-type="occupied" data-block="C">
+                        <div class="room-card-header">
+                            <span class="room-number-title"><span data-translate="room_prefix">Bilik</span> C501 <span style="font-size: 0.75rem; font-weight: normal; color: var(--secondary);">(<span data-translate="female">Perempuan</span>)</span></span>
+                            <span class="status-badge occupied" data-translate="btn_occupied">Penuh</span>
+                        </div>
+                        <div class="room-card-body">
+                            <div class="room-type-label" data-translate="type_warden">Bilik Warden</div>
+                            <div class="room-amenities">
+                                <i class="fas fa-wifi" title="Free Wifi"></i>
+                            </div>
+                        </div>
+                        <div class="room-card-footer">
+                            <span style="font-size: 0.75rem; color: var(--gray);"><i class="fas fa-user"></i> <span data-translate="lbl_warden">Warden</span>: Nurul Izzah</span>
+                            <button class="btn-sm btn-primary-sm" style="padding: 0.35rem 0.75rem; background: var(--gray);" onclick="toggleRoomStatus(this)" data-translate="btn_set_available_en">Set Available</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analytics-view" class="dashboard-view">
+                <div class="section-header">
+                    <h2 class="section-title" data-translate="analytics_header">Analytics & Business Intelligence</h2>
+                    <select style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; font-family: inherit;">
+                        <option data-translate="opt_30_days">Last 30 Days</option>
+                        <option data-translate="opt_6_months">Last 6 Months</option>
+                        <option data-translate="opt_this_year">This Year</option>
+                    </select>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label" data-translate="stat_total_earnings">Total Earnings</span>
+                            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 14.2%</span>
+                        </div>
+                        <div class="stat-value">RM 34,850.00</div>
+                        <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;" data-translate="desc_compared_last_month">Compared to last month</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label" data-translate="stat_occupancy_rate">Occupancy Rate</span>
+                            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 5.7%</span>
+                        </div>
+                        <div class="stat-value">84.6%</div>
+                        <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;" data-translate="desc_avg_30_days">Average rate over 30 days</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label" data-translate="stat_new_guests">New Guests</span>
+                            <span class="stat-trend down"><i class="fas fa-arrow-down"></i> 2.1%</span>
+                        </div>
+                        <div class="stat-value">124</div>
+                        <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;" data-translate="desc_reg_this_month">Registrations this month</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label" data-translate="stat_direct_bookings">Direct Bookings</span>
+                            <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 18.5%</span>
+                        </div>
+                        <div class="stat-value">72%</div>
+                        <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;" data-translate="desc_via_portal">Via SHMaaS portal</div>
+                    </div>
+                </div>
+
+                <div class="analytics-charts-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title" data-translate="revenue_trends_title">Revenue Trends (RM)</h3>
+                        </div>
+                        <!-- SVG chart representing Revenue trends -->
+                        <svg class="chart-svg" viewBox="0 0 500 220">
+                            <!-- Grid lines -->
+                            <line x1="40" y1="30" x2="480" y2="30" stroke="#f1f5f9" stroke-width="1" />
+                            <line x1="40" y1="80" x2="480" y2="80" stroke="#f1f5f9" stroke-width="1" />
+                            <line x1="40" y1="130" x2="480" y2="130" stroke="#f1f5f9" stroke-width="1" />
+                            <line x1="40" y1="180" x2="480" y2="180" stroke="#cbd5e1" stroke-width="1.5" />
+
+                            <!-- X Axis Labels -->
+                            <text x="50" y="200" fill="#64748b" font-size="11" text-anchor="middle">Oct</text>
+                            <text x="120" y="200" fill="#64748b" font-size="11" text-anchor="middle">Nov</text>
+                            <text x="190" y="200" fill="#64748b" font-size="11" text-anchor="middle">Dec</text>
+                            <text x="260" y="200" fill="#64748b" font-size="11" text-anchor="middle">Jan</text>
+                            <text x="330" y="200" fill="#64748b" font-size="11" text-anchor="middle">Feb</text>
+                            <text x="400" y="200" fill="#64748b" font-size="11" text-anchor="middle">Mar</text>
+
+                            <!-- Y Axis Labels -->
+                            <text x="30" y="184" fill="#64748b" font-size="10" text-anchor="end">RM 0</text>
+                            <text x="30" y="134" fill="#64748b" font-size="10" text-anchor="end">RM 5k</text>
+                            <text x="30" y="84" fill="#64748b" font-size="10" text-anchor="end">RM 10k</text>
+                            <text x="30" y="34" fill="#64748b" font-size="10" text-anchor="end">RM 15k</text>
+
+                            <!-- Gradient for area under chart -->
+                            <defs>
+                                <linearGradient id="chart-glow" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.3" />
+                                    <stop offset="100%" stop-color="var(--primary)" stop-opacity="0" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Area fill -->
+                            <path d="M 50 180 L 50 120 Q 85 90, 120 100 T 190 60 T 260 90 T 330 50 T 400 35 L 400 180 Z" fill="url(#chart-glow)" />
+
+                            <!-- Trend Line -->
+                            <path d="M 50 120 Q 85 90, 120 100 T 190 60 T 260 90 T 330 50 T 400 35" class="chart-line-path" />
+
+                            <!-- Data Dots -->
+                            <circle cx="50" cy="120" r="5" fill="var(--secondary)" stroke="white" stroke-width="1.5" />
+                            <circle cx="120" cy="100" r="5" fill="var(--secondary)" stroke="white" stroke-width="1.5" />
+                            <circle cx="190" cy="60" r="5" fill="var(--secondary)" stroke="white" stroke-width="1.5" />
+                            <circle cx="260" cy="90" r="5" fill="var(--secondary)" stroke="white" stroke-width="1.5" />
+                            <circle cx="330" cy="50" r="5" fill="var(--secondary)" stroke="white" stroke-width="1.5" />
+                            <circle cx="400" cy="35" r="5" fill="var(--secondary)" stroke="white" stroke-width="1.5" />
+                        </svg>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title" data-translate="occupancy_breakdown_title">Room Occupancy Breakdown</h3>
+                        </div>
+                        <div style="padding: 1rem 0;">
+                            <!-- Progress Bar 1 -->
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.35rem;">
+                                    <strong data-translate="type_deluxe">Deluxe Rooms</strong>
+                                    <span>92% (11/12 <span data-translate="lbl_occupied_lower">occupied</span>)</span>
+                                </div>
+                                <div style="height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden;">
+                                    <div style="width: 92%; height: 100%; background: var(--primary); border-radius: 99px;"></div>
+                                </div>
+                            </div>
+                            <!-- Progress Bar 2 -->
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.35rem;">
+                                    <strong data-translate="type_executive">Executive Suites</strong>
+                                    <span>80% (4/5 <span data-translate="lbl_occupied_lower">occupied</span>)</span>
+                                </div>
+                                <div style="height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden;">
+                                    <div style="width: 80%; height: 100%; background: var(--secondary); border-radius: 99px;"></div>
+                                </div>
+                            </div>
+                            <!-- Progress Bar 3 -->
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.35rem;">
+                                    <strong data-translate="type_standard">Standard Rooms</strong>
+                                    <span>75% (15/20 <span data-translate="lbl_occupied_lower">occupied</span>)</span>
+                                </div>
+                                <div style="height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden;">
+                                    <div style="width: 75%; height: 100%; background: var(--success); border-radius: 99px;"></div>
+                                </div>
+                            </div>
+                            <!-- Progress Bar 4 -->
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.35rem;">
+                                    <strong data-translate="type_shared">Shared Dorms</strong>
+                                    <span>50% (4/8 <span data-translate="lbl_active_lower">active</span>)</span>
+                                </div>
+                                <div style="height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden;">
+                                    <div style="width: 50%; height: 100%; background: var(--warning); border-radius: 99px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff View -->
+            <div id="staff-view" class="dashboard-view">
+                <div class="section-header">
+                    <h2 class="section-title" data-translate="staff_title">Pengurusan Warden</h2>
+                    <button class="btn-primary" onclick="openAdminModal('staff')">
+                        <i class="fas fa-plus"></i> <span data-translate="btn_add_staff">Tambah Warden Baharu</span>
+                    </button>
+                </div>
+
+                <div class="staff-grid" id="staff-grid">
+                    <!-- Staff 1 -->
+                    <div class="staff-card">
+                        <div class="staff-avatar-large">A</div>
+                        <div class="staff-name">Azman Ibrahim</div>
+                        <div class="staff-role" data-translate="role_senior_super">Penyelia Kanan & IT Admin</div>
+                        <div class="staff-status-dot active">
+                            <i class="fas fa-circle" style="font-size: 0.5rem;"></i> <span data-translate="status_on_duty">Bertugas</span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;"><i class="fas fa-envelope"></i> admin@shmaas.com</div>
+                        <div class="staff-contact">
+                            <button class="btn-action" title="Settings" onclick="showSection('settings')"><i class="fas fa-cog"></i></button>
+                            <button class="btn-action" title="Edit Shift"><i class="fas fa-calendar"></i></button>
+                        </div>
+                    </div>
+                    <!-- Staff 2 -->
+                    <div class="staff-card">
+                        <div class="staff-avatar-large" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">RK</div>
+                        <div class="staff-name">Razif Kamil</div>
+                        <div class="staff-role" data-translate="role_warden_a">Warden Blok A</div>
+                        <div class="staff-status-dot active">
+                            <i class="fas fa-circle" style="font-size: 0.5rem;"></i> <span data-translate="status_on_duty">Bertugas</span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;"><i class="fas fa-envelope"></i> razif@shmaas.com</div>
+                        <div class="staff-contact">
+                            <button class="btn-action" title="Mesej"><i class="fas fa-comment"></i></button>
+                            <button class="btn-action" title="Edit Jadual"><i class="fas fa-calendar"></i></button>
+                            <button class="btn-action" style="color: var(--danger);" onclick="deleteStaffCard(this)" title="Hapus"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <!-- Staff 3 -->
+                    <div class="staff-card">
+                        <div class="staff-avatar-large" style="background: linear-gradient(135deg, #10b981, #3b82f6);">AS</div>
+                        <div class="staff-name">Anis Suraya</div>
+                        <div class="staff-role" data-translate="role_warden_c">Warden Blok C</div>
+                        <div class="staff-status-dot inactive">
+                            <i class="fas fa-circle" style="font-size: 0.5rem;"></i> <span data-translate="status_off_duty">Cuti</span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;"><i class="fas fa-envelope"></i> anis@shmaas.com</div>
+                        <div class="staff-contact">
+                            <button class="btn-action" title="Mesej"><i class="fas fa-comment"></i></button>
+                            <button class="btn-action" title="Edit Jadual"><i class="fas fa-calendar"></i></button>
+                            <button class="btn-action" style="color: var(--danger);" onclick="deleteStaffCard(this)" title="Hapus"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <!-- Staff 4 -->
+                    <div class="staff-card">
+                        <div class="staff-avatar-large" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">MT</div>
+                        <div class="staff-name">Muiz Tarmizi</div>
+                        <div class="staff-role" data-translate="role_warden_b">Warden Blok B</div>
+                        <div class="staff-status-dot inactive">
+                            <i class="fas fa-circle" style="font-size: 0.5rem;"></i> <span data-translate="status_off_duty">Cuti</span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;"><i class="fas fa-envelope"></i> muiz@shmaas.com</div>
+                        <div class="staff-contact">
+                            <button class="btn-action" title="Mesej"><i class="fas fa-comment"></i></button>
+                            <button class="btn-action" title="Edit Jadual"><i class="fas fa-calendar"></i></button>
+                            <button class="btn-action" style="color: var(--danger);" onclick="deleteStaffCard(this)" title="Hapus"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="dashboard-view">
+                <div class="section-header">
+                    <h2 class="section-title" data-translate="settings_title">System Settings</h2>
+                </div>
+
+                <div class="settings-container">
+                    <div class="settings-sidebar">
+                        <button class="settings-tab-btn active" onclick="switchSettingsTab(this, 'general-settings')">
+                            <i class="fas fa-sliders-h"></i> <span data-translate="tab_general">General Settings</span>
+                        </button>
+                        <button class="settings-tab-btn" onclick="switchSettingsTab(this, 'booking-settings')">
+                            <i class="fas fa-calendar-alt"></i> <span data-translate="tab_booking">Booking Policies</span>
+                        </button>
+                        <button class="settings-tab-btn" onclick="switchSettingsTab(this, 'security-settings')">
+                            <i class="fas fa-shield-alt"></i> <span data-translate="tab_security">Security & Access</span>
+                        </button>
+                    </div>
+
+                    <div class="settings-content">
+                        <!-- Pane 1: General Settings -->
+                        <div id="general-settings" class="settings-content-pane active">
+                            <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem; text-align: left;" data-translate="lbl_general_props">General Properties</h3>
+                            <form onsubmit="saveSettingsForm(event)">
+                                <div class="form-group">
+                                    <label class="form-label" data-translate="lbl_hostel_name">Hostel Name</label>
+                                    <input type="text" class="form-input" value="SHMaaS Smart Hostel">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-translate="lbl_contact_email">Contact Email</label>
+                                    <input type="email" class="form-input" value="contact@shmaas.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-translate="lbl_address">Address</label>
+                                    <textarea class="form-textarea" rows="3">123 Technology Boulevard, Cyberjaya, Malaysia</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-translate="lbl_default_currency">Default Currency</label>
+                                    <select class="form-select">
+                                        <option value="USD">USD ($)</option>
+                                        <option value="MYR" selected>MYR (RM)</option>
+                                        <option value="EUR">EUR (€)</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn-primary" data-translate="btn_save_settings">Save Settings</button>
+                            </form>
+                        </div>
+
+                        <!-- Pane 2: Booking Policies -->
+                        <div id="booking-settings" class="settings-content-pane">
+                            <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem; text-align: left;" data-translate="lbl_booking_prefs">Booking Preferences</h3>
+                            <form onsubmit="saveSettingsForm(event)">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                                    <div>
+                                        <label class="form-label" data-translate="lbl_checkin_time">Default Check-in Time</label>
+                                        <input type="time" class="form-input" value="14:00">
+                                    </div>
+                                    <div>
+                                        <label class="form-label" data-translate="lbl_checkout_time">Default Check-out Time</label>
+                                        <input type="time" class="form-input" value="11:00">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-translate="lbl_cancellation">Cancellation Window</label>
+                                    <select class="form-select">
+                                        <option value="24" data-translate="opt_cancel_24">24 hours before check-in (Free)</option>
+                                        <option value="48" selected data-translate="opt_cancel_48">48 hours before check-in (Free)</option>
+                                        <option value="non-refundable" data-translate="opt_cancel_none">Non-refundable</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-translate="lbl_auto_allocation">Automatic Allocation</label>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                                        <input type="checkbox" id="auto-alloc" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                        <label for="auto-alloc" style="cursor: pointer; font-size: 0.875rem;" data-translate="lbl_auto_allocation_desc">Enable AI room allocation on payment confirmation</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary" data-translate="btn_save_policies">Save Policies</button>
+                            </form>
+                        </div>
+
+                        <!-- Pane 3: Security Settings -->
+                        <div id="security-settings" class="settings-content-pane">
+                            <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem; text-align: left;" data-translate="lbl_security_pwd">Security & Password</h3>
+                            <form onsubmit="saveSettingsForm(event)">
+                                <div class="form-group">
+                                    <label class="form-label" data-translate="lbl_current_pwd">Current Password</label>
+                                    <input type="password" class="form-input" placeholder="••••••••">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-translate="lbl_new_pwd">New Password</label>
+                                    <input type="password" class="form-input" placeholder="Min. 8 characters" data-translate-placeholder="ph_min_chars">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-translate="lbl_confirm_new_pwd">Confirm New Password</label>
+                                    <input type="password" class="form-input" placeholder="Re-type new password" data-translate-placeholder="ph_retype_pwd">
+                                </div>
+                                <button type="submit" class="btn-primary" data-translate="btn_change_pwd">Change Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Admin Add Modals -->
+        <div id="adminModal" class="admin-modal" onclick="closeAdminModalOutside(event)">
+            <div class="admin-modal-content">
+                <button class="modal-close-btn" onclick="closeAdminModal()"><i class="fas fa-times"></i></button>
+                <h3 id="modal-title" style="font-size: 1.25rem; margin-bottom: 1.5rem; font-weight: 700; color: var(--dark); text-align: left;" data-translate="lbl_add_item">Add Item</h3>
+                
+                <div id="modal-body">
+                    <!-- Form contents will be injected dynamically depending on item type -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+
+        // Show different sections (Single Page Application view toggler)
+        function showSection(sectionId) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Find and add active class to clicked item or matched item
+            let foundActive = false;
+            if (window.event && window.event.currentTarget && window.event.currentTarget.classList.contains('nav-item')) {
+                window.event.currentTarget.classList.add('active');
+                foundActive = true;
+            }
+            
+            if (!foundActive) {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    const onclickAttr = item.getAttribute('onclick');
+                    if (onclickAttr && onclickAttr.includes(`'${sectionId}'`)) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            // Hide all dashboard views
+            document.querySelectorAll('.dashboard-view').forEach(view => {
+                view.classList.remove('active-view');
+            });
+
+            // Show active view
+            const targetView = document.getElementById(`${sectionId}-view`);
+            if (targetView) {
+                targetView.classList.add('active-view');
+            }
+
+            // Close mobile sidebar if active
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+            
+            // Update search placeholder
+            const searchInput = document.querySelector('.search-box input');
+            if (searchInput) {
+                searchInput.placeholder = `Search ${sectionId}...`;
+            }
+
+            // Show toast notification
+            showToast(`Navigating to ${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}...`);
+        }
+
+        // Functions to handle interactive modal form changes
+        function handleGuestFormChange() {
+            const semester = document.getElementById('g-tier').value;
+            const housing = document.getElementById('g-housing').value;
+            const letterContainer = document.getElementById('g-letter-container');
+            if (letterContainer) {
+                // Show permit letter field only for Sem 1 and Sem 2 living outside
+                if (housing === 'Duduk Luar' && (semester === 'Semester 1' || semester === 'Semester 2')) {
+                    letterContainer.style.display = 'block';
+                } else {
+                    letterContainer.style.display = 'none';
+                }
+            }
+        }
+
+        function handleBookingDateChange() {
+            const checkinVal = document.getElementById('b-checkin').value;
+            const checkoutInput = document.getElementById('b-checkout');
+            if (checkinVal && checkoutInput) {
+                // 1 Semester = 6 Months, but students go home by end of month 5
+                const date = new Date(checkinVal);
+                date.setMonth(date.getMonth() + 5);
+                
+                const yyyy = date.getFullYear();
+                let mm = date.getMonth() + 1;
+                let dd = date.getDate();
+                
+                if (mm < 10) mm = '0' + mm;
+                if (dd < 10) dd = '0' + dd;
+                
+                checkoutInput.value = `${yyyy}-${mm}-${dd}`;
+            }
+        }
+
+        // Modals Management
+        function openAdminModal(type) {
+            const modal = document.getElementById('adminModal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            if (type === 'booking') {
+                title.textContent = getTranslation('title_add_booking');
+                title.setAttribute('data-translate', 'title_add_booking');
+                body.innerHTML = `
+                    <form onsubmit="submitNewBooking(event)">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_student_name">Nama Pelajar</label>
+                            <input type="text" id="b-guest-name" class="form-input" required placeholder="Ahmad Fauzi">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_student_email">E-mel Pelajar</label>
+                            <input type="email" id="b-guest-email" class="form-input" required placeholder="ahmad@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_block_room_alloc">Agihan Blok & Bilik</label>
+                            <select id="b-room" class="form-select" required>
+                                <option value="Blok A - A101">Blok A - A101 (Lelaki - Single)</option>
+                                <option value="Blok C - C105">Blok C - C105 (Perempuan - 2 Katil)</option>
+                                <option value="Blok A - A204">Blok A - A204 (Lelaki - 4 Katil)</option>
+                                <option value="Blok A - A302">Blok A - A302 (Lelaki - Single)</option>
+                                <option value="Blok B - B405">Blok B - B405 (Lelaki - 6 Katil)</option>
+                                <option value="Blok C - C501">Blok C - C501 (Perempuan - Warden)</option>
+                            </select>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;" class="form-group">
+                            <div>
+                                <label class="form-label" data-translate="lbl_checkin">Daftar Masuk</label>
+                                <input type="date" id="b-checkin" class="form-input" required onchange="handleBookingDateChange()">
+                            </div>
+                            <div>
+                                <label class="form-label" data-translate="lbl_checkout">Daftar Keluar (Auto 5 Bulan)</label>
+                                <input type="date" id="b-checkout" class="form-input" required readonly style="background: var(--light); cursor: not-allowed;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_hostel_fees">Yuran Masuk Asrama (RM)</label>
+                            <input type="text" id="b-price" class="form-input" required value="RM 50.00" readonly style="background: var(--light); cursor: not-allowed;">
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;" data-translate="btn_save_booking">Simpan Pendaftaran</button>
+                    </form>
+                `;
+            } else if (type === 'guest') {
+                title.textContent = getTranslation('title_add_guest');
+                title.setAttribute('data-translate', 'title_add_guest');
+                body.innerHTML = `
+                    <form onsubmit="submitNewGuest(event)">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_student_name">Nama Pelajar</label>
+                            <input type="text" id="g-name" class="form-input" required placeholder="Siti Aishah">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_contact_email">Alamat E-mel</label>
+                            <input type="email" id="g-email" class="form-input" required placeholder="aishah@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_phone">No. Telefon</label>
+                            <input type="tel" id="g-phone" class="form-input" required placeholder="+6012-3456789">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;" class="form-group">
+                            <div>
+                                <label class="form-label" data-translate="th_study_year">Semester</label>
+                                <select id="g-tier" class="form-select" onchange="handleGuestFormChange()">
+                                    <option value="Semester 1" data-translate="study_year_1">Semester 1</option>
+                                    <option value="Semester 2" data-translate="study_year_2">Semester 2</option>
+                                    <option value="Semester 3" data-translate="study_year_3">Semester 3</option>
+                                    <option value="Semester 4" data-translate="study_year_4">Semester 4</option>
+                                    <option value="Semester 5" data-translate="study_year_5">Semester 5</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Status Kediaman</label>
+                                <select id="g-housing" class="form-select" onchange="handleGuestFormChange()">
+                                    <option value="Asrama">Tinggal di Asrama</option>
+                                    <option value="Duduk Luar">Duduk Luar Asrama</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" id="g-letter-container" style="display: none;">
+                            <label class="form-label" style="color: var(--danger); font-weight: 600;">Mengemukakan Surat Kebenaran?</label>
+                            <select id="g-letter" class="form-select">
+                                <option value="Tidak">Tidak (Tiada Surat)</option>
+                                <option value="Ya">Ya (Ada Surat Dilampirkan)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Yuran Masuk Dibayar (RM)</label>
+                            <select id="g-paid-status" class="form-select">
+                                <option value="RM 50.00">Telah Bayar (RM 50.00)</option>
+                                <option value="RM 0.00">Belum Bayar (RM 0.00)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;" data-translate="btn_save_student_record">Simpan Rekod Pelajar</button>
+                    </form>
+                `;
+            } else if (type === 'room') {
+                title.textContent = getTranslation('title_add_room');
+                title.setAttribute('data-translate', 'title_add_room');
+                body.innerHTML = `
+                    <form onsubmit="submitNewRoom(event)">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_room_number">Nombor Bilik</label>
+                            <input type="text" id="r-number" class="form-input" required placeholder="e.g. A205">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_room_type">Jenis Bilik</label>
+                            <select id="r-type" class="form-select">
+                                <option value="Single Bed" data-translate="type_single">Bilik Single</option>
+                                <option value="Shared 2-Bed" data-translate="type_shared_2_bed">Bilik 2 Katil</option>
+                                <option value="Shared 4-Bed" data-translate="type_shared_4_bed">Bilik 4 Katil</option>
+                                <option value="Shared 6-Bed" data-translate="type_shared_6_bed">Bilik 6 Katil</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_initial_status">Status Awal</label>
+                            <select id="r-status" class="form-select">
+                                <option value="Available" data-translate="btn_available">Kosong</option>
+                                <option value="Occupied" data-translate="btn_occupied">Penuh</option>
+                                <option value="Cleaning" data-translate="btn_cleaning_tab">Pembersihan</option>
+                                <option value="Maintenance" data-translate="btn_maintenance_tab">Penyelenggaraan</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;" data-translate="btn_save_room">Simpan Bilik</button>
+                    </form>
+                `;
+            } else if (type === 'staff') {
+                title.textContent = getTranslation('title_add_staff');
+                title.setAttribute('data-translate', 'title_add_staff');
+                body.innerHTML = `
+                    <form onsubmit="submitNewStaff(event)">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_warden_name">Nama Warden</label>
+                            <input type="text" id="s-name" class="form-input" required placeholder="Danish Hakim">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_warden_role">Peranan / Blok Tugas</label>
+                            <input type="text" id="s-role" class="form-input" required placeholder="Warden Blok A (Malam)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="lbl_contact_email">E-mel</label>
+                            <input type="email" id="s-email" class="form-input" required placeholder="danish@shmaas.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="th_status">Status</label>
+                            <select id="s-status" class="form-select">
+                                <option value="active" data-translate="status_on_duty">Bertugas</option>
+                                <option value="inactive" data-translate="status_off_duty">Cuti</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;" data-translate="btn_save_staff">Simpan Warden</button>
+                    </form>
+                `;
+            }
+            updateTranslations();
+            modal.style.display = 'flex';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function closeAdminModalOutside(event) {
+            if (event.target === document.getElementById('adminModal')) {
+                closeAdminModal();
+            }
+        }
+
+        // Submitting new items dynamically
+        function submitNewBooking(event) {
+            event.preventDefault();
+            const name = document.getElementById('b-guest-name').value;
+            const email = document.getElementById('b-guest-email').value;
+            const room = document.getElementById('b-room').value;
+            const checkin = document.getElementById('b-checkin').value;
+            const checkout = document.getElementById('b-checkout').value;
+            const price = document.getElementById('b-price').value;
+            
+            const tableBody = document.querySelector('#bookings-table tbody');
+            const randId = Math.floor(1000 + Math.random() * 9000);
+            
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-status', 'pending');
+            tr.innerHTML = `
+                <td><strong>#BK-${randId}</strong></td>
+                <td>
+                    <div class="guest-info">
+                        <div class="guest-avatar">${name.split(' ').map(x=>x[0]).join('').toUpperCase()}</div>
+                        <div>
+                            <div class="guest-name">${name}</div>
+                            <div class="guest-email">${email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>${room}</td>
+                <td>${checkin} - ${checkout}</td>
+                <td>${price}</td>
+                <td><span class="status pending">Pending</span></td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-action" title="Confirm Check In" onclick="updateBookingStatus(this, 'checked-in')"><i class="fas fa-check"></i></button>
+                        <button class="btn-action" title="Cancel" onclick="deleteBookingRow(this)"><i class="fas fa-times"></i></button>
+                    </div>
+                </td>
+            `;
+            tableBody.insertBefore(tr, tableBody.firstChild);
+            closeAdminModal();
+            showToast('Booking added successfully!', 'success');
+        }
+
+        function submitNewGuest(event) {
+            event.preventDefault();
+            const name = document.getElementById('g-name').value;
+            const email = document.getElementById('g-email').value;
+            const phone = document.getElementById('g-phone').value;
+            const tier = document.getElementById('g-tier').value;
+            
+            const housing = document.getElementById('g-housing').value;
+            const feesPaid = document.getElementById('g-paid-status').value;
+            let dormStatusHtml = '';
+            
+            if (tier === 'Semester 1' || tier === 'Semester 2') {
+                if (housing === 'Asrama') {
+                    dormStatusHtml = `<span style="color: var(--success); font-weight: 600;"><i class="fas fa-home"></i> <span data-translate="badge_dorm_wajib">Asrama (Wajib)</span></span>`;
+                } else {
+                    const letter = document.getElementById('g-letter').value;
+                    if (letter === 'Ya') {
+                        dormStatusHtml = `<span style="color: var(--primary); font-weight: 600;"><i class="fas fa-envelope-open-text"></i> <span data-translate="badge_dorm_luar_surat">Luar Asrama (Bersurat)</span></span>`;
+                    } else {
+                        dormStatusHtml = `<span style="color: var(--danger); font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> <span data-translate="badge_dorm_luar_no_surat">Luar Asrama (TIADA SURAT!)</span></span>`;
+                    }
+                }
+            } else { // Semester 3, 4, 5
+                if (housing === 'Asrama') {
+                    dormStatusHtml = `<span style="color: #f59e0b; font-weight: 600;"><i class="fas fa-check-circle"></i> <span data-translate="badge_dorm_pilihan">Asrama (Pilihan)</span></span>`;
+                } else {
+                    dormStatusHtml = `<span style="color: var(--gray); font-weight: 500;"><i class="fas fa-sign-out-alt"></i> <span data-translate="badge_dorm_luar">Luar Asrama</span></span>`;
+                }
+            }
+            
+            const tableBody = document.querySelector('#guests-table tbody');
+            const randId = Math.floor(1000 + Math.random() * 9000);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>#G-${randId}</strong></td>
+                <td>
+                    <div class="guest-info">
+                        <div class="guest-avatar">${name.split(' ').map(x=>x[0]).join('').toUpperCase()}</div>
+                        <div>
+                            <div class="guest-name">${name}</div>
+                            <span class="status-badge available" style="padding: 0.1rem 0.5rem; font-size: 0.65rem;">Active</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div><i class="fas fa-envelope" style="color: var(--gray); margin-right: 0.5rem;"></i> ${email}</div>
+                    <div style="margin-top: 0.25rem;"><i class="fas fa-phone" style="color: var(--gray); margin-right: 0.5rem;"></i> ${phone}</div>
+                </td>
+                <td><span>${tier}</span></td>
+                <td>${feesPaid}</td>
+                <td>${dormStatusHtml}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-action" title="Edit Pelajar"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action" style="color: var(--danger);" onclick="deleteTableRow(this)" title="Hapus"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            `;
+            tableBody.insertBefore(tr, tableBody.firstChild);
+            closeAdminModal();
+            showToast('Student record added successfully!', 'success');
+        }
+
+        function submitNewRoom(event) {
+            event.preventDefault();
+            const num = document.getElementById('r-number').value;
+            const type = document.getElementById('r-type').value;
+            const status = document.getElementById('r-status').value;
+            
+            const grid = document.getElementById('rooms-grid');
+            const card = document.createElement('div');
+            card.className = 'room-card-admin';
+            card.setAttribute('data-type', status.toLowerCase());
+            
+            const blockLetter = num.replace(/[^A-Za-z]/g, '').charAt(0).toUpperCase();
+            card.setAttribute('data-block', blockLetter || 'A');
+            
+            const statusClass = status.toLowerCase();
+            const statusText = status === 'Available' ? 'Kosong' : status === 'Occupied' ? 'Penuh' : status === 'Cleaning' ? 'Pembersihan' : 'Penyelenggaraan';
+            const footerBtnText = status === 'Occupied' ? 'Set Kosong' : 'Set Penuh';
+            const footerBtnClass = status === 'Occupied' ? 'background: var(--gray);' : '';
+            
+            const genderText = num.startsWith('C') || num.startsWith('c') ? '(Perempuan)' : '(Lelaki)';
+            const genderColor = num.startsWith('C') || num.startsWith('c') ? 'var(--secondary)' : 'var(--primary)';
+            
+            card.innerHTML = `
+                <div class="room-card-header">
+                    <span class="room-number-title">${num} <span style="font-size: 0.75rem; font-weight: normal; color: ${genderColor};">${genderText}</span></span>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+                <div class="room-card-body">
+                    <div class="room-type-label">${type}</div>
+                    <div class="room-amenities">
+                        <i class="fas fa-wifi" title="Free Wifi"></i>
+                    </div>
+                </div>
+                <div class="room-card-footer">
+                    <span style="font-size: 0.75rem; color: var(--gray);"><i class="fas fa-key"></i> Kunci Pintar Aktif</span>
+                    <button class="btn-sm btn-primary-sm" style="padding: 0.35rem 0.75rem; ${footerBtnClass}" onclick="toggleRoomStatus(this)">${footerBtnText}</button>
+                </div>
+            `;
+            grid.insertBefore(card, grid.firstChild);
+            applyRoomFilters();
+            closeAdminModal();
+            showToast('Bilik berjaya ditambah!', 'success');
+        }
+
+        function submitNewStaff(event) {
+            event.preventDefault();
+            const name = document.getElementById('s-name').value;
+            const role = document.getElementById('s-role').value;
+            const email = document.getElementById('s-email').value;
+            const status = document.getElementById('s-status').value;
+            
+            const grid = document.getElementById('staff-grid');
+            const card = document.createElement('div');
+            card.className = 'staff-card';
+            
+            const statusText = status === 'active' ? 'On Shift' : 'Off Duty';
+            const statusDotClass = status === 'active' ? 'active' : 'inactive';
+            const avatarLetter = name.split(' ').map(x=>x[0]).join('').toUpperCase();
+            
+            card.innerHTML = `
+                <div class="staff-avatar-large">${avatarLetter}</div>
+                <div class="staff-name">${name}</div>
+                <div class="staff-role">${role}</div>
+                <div class="staff-status-dot ${statusDotClass}">
+                    <i class="fas fa-circle" style="font-size: 0.5rem;"></i> ${statusText}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;"><i class="fas fa-envelope"></i> ${email}</div>
+                <div class="staff-contact">
+                    <button class="btn-action" title="Message"><i class="fas fa-comment"></i></button>
+                    <button class="btn-action" title="Edit Shift"><i class="fas fa-calendar"></i></button>
+                    <button class="btn-action" style="color: var(--danger);" onclick="deleteStaffCard(this)" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            grid.insertBefore(card, grid.firstChild);
+            closeAdminModal();
+            showToast('Staff member added!', 'success');
+        }
+
+        // Action Interactions
+        function updateBookingStatus(btn, newStatus) {
+            const tr = btn.closest('tr');
+            tr.setAttribute('data-status', newStatus);
+            
+            const statusSpan = tr.querySelector('.status');
+            statusSpan.className = `status ${newStatus}`;
+            
+            if (newStatus === 'checked-in') {
+                statusSpan.textContent = 'Aktif';
+                btn.outerHTML = `<button class="btn-action" title="Daftar Keluar" onclick="updateBookingStatus(this, 'checked-out')"><i class="fas fa-sign-out-alt"></i></button>`;
+                showToast('Pelajar didaftar masuk!', 'success');
+            } else if (newStatus === 'checked-out') {
+                statusSpan.textContent = 'Selesai';
+                btn.closest('.action-btns').innerHTML = `<button class="btn-action" title="Daftar Semula"><i class="fas fa-redo"></i></button>`;
+                showToast('Pelajar didaftar keluar!', 'info');
+            }
+        }
+
+        // Delete handlers
+        function deleteBookingRow(btn) {
+            if (confirm('Cancel this booking?')) {
+                const tr = btn.closest('tr');
+                tr.style.opacity = '0';
+                setTimeout(() => {
+                    tr.remove();
+                    showToast('Booking cancelled.', 'error');
+                }, 300);
+            }
+        }
+
+        function deleteTableRow(btn) {
+            if (confirm('Are you sure you want to remove this record?')) {
+                const tr = btn.closest('tr');
+                tr.style.opacity = '0';
+                setTimeout(() => {
+                    tr.remove();
+                    showToast('Record deleted.', 'error');
+                }, 300);
+            }
+        }
+
+        function deleteStaffCard(btn) {
+            if (confirm('Remove staff member?')) {
+                const card = btn.closest('.staff-card');
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    card.remove();
+                    showToast('Staff member removed.', 'error');
+                }, 300);
+            }
+        }
+
+        function toggleRoomStatus(btn) {
+            const card = btn.closest('.room-card-admin');
+            const badge = card.querySelector('.status-badge');
+            const currentStatus = card.getAttribute('data-type');
+            
+            if (currentStatus === 'occupied') {
+                card.setAttribute('data-type', 'available');
+                badge.className = 'status-badge available';
+                badge.textContent = 'Kosong';
+                btn.textContent = 'Set Penuh';
+                btn.style.background = 'var(--primary)';
+                showToast('Bilik ditetapkan kepada Kosong', 'success');
+            } else {
+                card.setAttribute('data-type', 'occupied');
+                badge.className = 'status-badge occupied';
+                badge.textContent = 'Penuh';
+                btn.textContent = 'Set Kosong';
+                btn.style.background = 'var(--gray)';
+                showToast('Bilik ditetapkan kepada Penuh', 'info');
+            }
+            applyRoomFilters();
+        }
+
+        // Filtering Logic
+        function filterBookings(status) {
+            // Update tabs
+            const tabs = event.currentTarget.parentNode.querySelectorAll('.filter-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            const rows = document.querySelectorAll('#bookings-table tbody tr');
+            rows.forEach(row => {
+                if (status === 'all' || row.getAttribute('data-status') === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        let currentStatusFilter = 'all';
+        let currentBlockFilter = 'all';
+
+        function filterRooms(status, btn) {
+            const activeBtn = btn || event.currentTarget;
+            const tabs = activeBtn.parentNode.querySelectorAll('.filter-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            activeBtn.classList.add('active');
+
+            currentStatusFilter = status;
+            applyRoomFilters();
+        }
+
+        function filterRoomsByBlock(block, btn) {
+            const activeBtn = btn || event.currentTarget;
+            const tabs = activeBtn.parentNode.querySelectorAll('.filter-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            activeBtn.classList.add('active');
+
+            currentBlockFilter = block;
+            applyRoomFilters();
+        }
+
+        function applyRoomFilters() {
+            const cards = document.querySelectorAll('#rooms-grid .room-card-admin');
+            cards.forEach(card => {
+                const type = card.getAttribute('data-type') || 'available';
+                const block = card.getAttribute('data-block') || '';
+                
+                const matchType = (currentStatusFilter === 'all' || type === currentStatusFilter);
+                const matchBlock = (currentBlockFilter === 'all' || block === currentBlockFilter);
+                
+                if (matchType && matchBlock) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Settings View Tabs Switching
+        function switchSettingsTab(btn, tabId) {
+            // Remove active classes
+            const btns = btn.parentNode.querySelectorAll('.settings-tab-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const panes = document.querySelectorAll('.settings-content-pane');
+            panes.forEach(p => p.classList.remove('active'));
+
+            const activePane = document.getElementById(tabId);
+            if (activePane) activePane.classList.add('active');
+        }
+
+        // Language Translation System
+        let currentLanguage = 'ms'; // Default language
+
+        const translations = {
+            ms: {
+                sub_title: "Pengurusan Asrama",
+                nav_main: "Utama",
+                nav_dashboard: "Panel Kawalan",
+                nav_bookings: "Pendaftaran Bilik",
+                nav_students: "Direktori Pelajar",
+                nav_rooms: "Bilik Asrama",
+                nav_mgmt: "Pengurusan",
+                nav_analytics: "Analisis Asrama",
+                nav_staff: "Pengurusan Warden",
+                nav_settings: "Tetapan Sistem",
+                logout: "Log Keluar",
+                search_placeholder: "Cari pendaftaran, pelajar, bilik...",
+                stat_occupancy: "Kadar Penghunian",
+                stat_fees: "Kutipan Yuran Bulan Ini",
+                stat_active: "Pendaftaran Aktif",
+                stat_beds: "Katil Tersedia",
+                recent_bookings_title: "Pendaftaran Terbaharu",
+                btn_all: "Semua",
+                th_student: "Pelajar",
+                th_block_room: "Blok & Bilik",
+                th_session_date: "Tarikh Sesi",
+                th_status: "Status",
+                th_action: "Tindakan",
+                status_active: "Aktif",
+                status_pending: "Menunggu",
+                status_completed: "Selesai",
+                recent_activity_title: "Aktiviti Terbaharu",
+                btn_view_all: "Lihat Semua",
+                activity_checkin: "Daftar masuk",
+                activity_new_booking: "Pendaftaran Baharu",
+                activity_checkout: "Daftar keluar",
+                activity_new_review: "Ulasan Baharu",
+                act_fauzi_in: "Ahmad Fauzi mendaftar masuk ke Bilik A204",
+                act_aminah_book: "Siti Aminah menempah Bilik C105",
+                act_taufik_out: "Taufik Hidayat mendaftar keluar dari Asrama B102",
+                act_izzah_review: "Nurul Izzah memberikan ulasan 5-bintang",
+                time_2m: "2 minit lepas",
+                time_15m: "15 minit lepas",
+                time_1h: "1 jam lepas",
+                time_3h: "3 jam lepas",
+                occupancy_overview_title: "Ringkasan Penghunian",
+                opt_7_days: "7 Hari Lepas",
+                opt_30_days: "30 Hari Lepas",
+                opt_this_year: "Tahun Ini",
+                chart_interactive: "Visualisasi Carta Interaktif",
+                bookings_title: "Pengurusan Pendaftaran Bilik",
+                btn_add_booking: "Tambah Pendaftaran",
+                th_reg_id: "ID Daftar",
+                th_fees_paid: "Yuran Masuk (RM)",
+                guests_title: "Direktori Pelajar",
+                btn_add_guest: "Tambah Pelajar Baharu",
+                th_student_id: "ID Pelajar",
+                th_name: "Nama",
+                th_contact: "Maklumat Hubungan",
+                th_study_year: "Semester",
+                th_student_status: "Status Asrama",
+                study_year_1: "Semester 1",
+                study_year_2: "Semester 2",
+                study_year_3: "Semester 3",
+                study_year_4: "Semester 4",
+                study_year_5: "Semester 5",
+                badge_dorm_wajib: "Asrama (Wajib)",
+                badge_dorm_pilihan: "Asrama (Pilihan)",
+                badge_dorm_luar_surat: "Luar Asrama (Bersurat)",
+                badge_dorm_luar_no_surat: "Luar Asrama (TIADA SURAT!)",
+                badge_dorm_luar: "Luar Asrama",
+                badge_local_student: "Pelajar Tempatan",
+                badge_excellent_student: "Pelajar Cemerlang",
+                badge_suspended: "Digantung",
+                rooms_title: "Pengurusan Bilik Asrama",
+                btn_add_room: "Tambah Bilik",
+                sum_total_rooms: "Jumlah Bilik: 172",
+                sum_available_rooms: "Kosong: 78",
+                sum_occupied_rooms: "Penuh: 82",
+                sum_cleaning_rooms: "Pembersihan: 8",
+                sum_maintenance_rooms: "Penyelenggaraan: 4",
+                btn_all_status: "Semua Status",
+                btn_available: "Kosong",
+                btn_occupied: "Penuh",
+                btn_cleaning_tab: "Pembersihan",
+                btn_maintenance_tab: "Penyelenggaraan",
+                btn_all_blocks: "Semua Blok",
+                btn_block_a: "Blok A",
+                btn_block_b: "Blok B",
+                btn_block_c: "Blok C",
+                room_prefix: "Bilik",
+                male: "Lelaki",
+                female: "Perempuan",
+                status_available_en: "Kosong",
+                type_single: "Bilik Single",
+                smart_key_active: "Kunci Pintar Aktif",
+                btn_set_occupied: "Set Penuh",
+                btn_set_available: "Set Kosong",
+                type_shared_2: "Bilik Kongsi (2 Katil)",
+                lbl_student: "Pelajar",
+                type_shared_4: "Bilik Kongsi (4 Katil)",
+                lbl_cleaning_work: "Kerja Pembersihan",
+                type_shared_6: "Bilik Kongsi (6 Katil)",
+                lbl_maintenance_work: "Penyelenggaraan",
+                type_warden: "Bilik Warden",
+                lbl_warden: "Warden",
+                btn_set_available_en: "Set Kosong",
+                analytics_header: "Analytics & Business Intelligence",
+                opt_6_months: "6 Bulan Lepas",
+                stat_total_earnings: "Jumlah Pendapatan",
+                desc_compared_last_month: "Berbanding bulan lepas",
+                stat_occupancy_rate: "Kadar Penghunian",
+                desc_avg_30_days: "Kadar purata selama 30 hari",
+                stat_new_guests: "Pelajar Baharu",
+                desc_reg_this_month: "Pendaftaran bulan ini",
+                stat_direct_bookings: "Pendaftaran Terus",
+                desc_via_portal: "Melalui portal SHMaaS",
+                revenue_trends_title: "Trend Pendapatan (RM)",
+                occupancy_breakdown_title: "Pecahan Penghunian Bilik",
+                type_deluxe: "Bilik Deluxe",
+                lbl_occupied_lower: "terisi",
+                type_executive: "Suite Eksekutif",
+                type_standard: "Bilik Standard",
+                type_shared: "Asrama Kongsi",
+                lbl_active_lower: "aktif",
+                staff_title: "Pengurusan Warden",
+                btn_add_staff: "Tambah Warden Baharu",
+                role_senior_super: "Penyelia Kanan & IT Admin",
+                status_on_duty: "Bertugas",
+                role_warden_a: "Warden Blok A",
+                role_warden_c: "Warden Blok C",
+                status_off_duty: "Cuti",
+                role_warden_b: "Warden Blok B",
+                settings_title: "Tetapan Sistem",
+                tab_general: "Tetapan Umum",
+                tab_booking: "Polisi Pendaftaran",
+                tab_security: "Keselamatan & Akses",
+                lbl_general_props: "Ciri-ciri Umum",
+                lbl_hostel_name: "Nama Asrama",
+                lbl_contact_email: "E-mel Hubungan",
+                lbl_address: "Alamat",
+                lbl_default_currency: "Mata Wang Lalai",
+                btn_save_settings: "Simpan Tetapan",
+                lbl_booking_prefs: "Pilihan Pendaftaran",
+                lbl_checkin_time: "Masa Daftar Masuk Lalai",
+                lbl_checkout_time: "Masa Daftar Keluar Lalai",
+                lbl_cancellation: "Tempoh Pembatalan",
+                opt_cancel_24: "24 jam sebelum check-in (Percuma)",
+                opt_cancel_48: "48 jam sebelum check-in (Percuma)",
+                opt_cancel_none: "Tidak boleh dikembalikan",
+                lbl_auto_allocation: "Peruntukan Automatik",
+                lbl_auto_allocation_desc: "Aktifkan peruntukan bilik AI setelah pengesahan pembayaran",
+                btn_save_policies: "Simpan Polisi",
+                lbl_security_pwd: "Keselamatan & Kata Laluan",
+                lbl_current_pwd: "Kata Laluan Semasa",
+                lbl_new_pwd: "Kata Laluan Baharu",
+                ph_min_chars: "Min. 8 aksara",
+                lbl_confirm_new_pwd: "Sahkan Kata Laluan Baharu",
+                ph_retype_pwd: "Tiap semula kata laluan baharu",
+                btn_change_pwd: "Tukar Kata Laluan",
+                lbl_add_item: "Tambah Item",
+                title_add_booking: "Tambah Pendaftaran Baharu",
+                lbl_student_name: "Nama Pelajar",
+                lbl_student_email: "E-mel Pelajar",
+                lbl_block_room_alloc: "Agihan Blok & Bilik",
+                lbl_checkin: "Daftar Masuk",
+                lbl_checkout: "Daftar Keluar",
+                lbl_hostel_fees: "Yuran Asrama (RM)",
+                btn_save_booking: "Simpan Pendaftaran",
+                title_add_guest: "Tambah Pelajar Baharu",
+                lbl_phone: "No. Telefon",
+                btn_save_student_record: "Simpan Rekod Pelajar",
+                title_add_room: "Tambah Bilik Baharu",
+                lbl_room_number: "Nombor Bilik",
+                lbl_room_type: "Jenis Bilik",
+                lbl_initial_status: "Status Awal",
+                type_shared_2_bed: "Bilik 2 Katil",
+                type_shared_4_bed: "Bilik 4 Katil",
+                type_shared_6_bed: "Bilik 6 Katil",
+                btn_save_room: "Simpan Bilik",
+                title_add_staff: "Tambah Ahli Staf / Warden",
+                lbl_warden_name: "Nama Warden",
+                lbl_warden_role: "Peranan / Blok Tugas",
+                btn_save_staff: "Simpan Warden",
+                toast_saved_success: "Tetapan berjaya disimpan!",
+                toast_logout: "Log keluar..."
+            },
+            en: {
+                sub_title: "Dormitory Management",
+                nav_main: "Main",
+                nav_dashboard: "Dashboard",
+                nav_bookings: "Room Registration",
+                nav_students: "Student Directory",
+                nav_rooms: "Dormitory Rooms",
+                nav_mgmt: "Management",
+                nav_analytics: "Dormitory Analytics",
+                nav_staff: "Warden Management",
+                nav_settings: "System Settings",
+                logout: "Logout",
+                search_placeholder: "Search registration, student, room...",
+                stat_occupancy: "Occupancy Rate",
+                stat_fees: "Fee Collection This Month",
+                stat_active: "Active Registrations",
+                stat_beds: "Beds Available",
+                recent_bookings_title: "Recent Registrations",
+                btn_all: "All",
+                th_student: "Student",
+                th_block_room: "Block & Room",
+                th_session_date: "Session Date",
+                th_status: "Status",
+                th_action: "Action",
+                status_active: "Active",
+                status_pending: "Pending",
+                status_completed: "Completed",
+                recent_activity_title: "Recent Activity",
+                btn_view_all: "View All",
+                activity_checkin: "Check-in",
+                activity_new_booking: "New Booking",
+                activity_checkout: "Check-out",
+                activity_new_review: "New Review",
+                act_fauzi_in: "Ahmad Fauzi checked into Room A204",
+                act_aminah_book: "Siti Aminah booked Room C105",
+                act_taufik_out: "Taufik Hidayat checked out from Dorm B102",
+                act_izzah_review: "Nurul Izzah left a 5-star review",
+                time_2m: "2 min ago",
+                time_15m: "15 min ago",
+                time_1h: "1 hour ago",
+                time_3h: "3 hours ago",
+                occupancy_overview_title: "Occupancy Overview",
+                opt_7_days: "Last 7 Days",
+                opt_30_days: "Last 30 Days",
+                opt_this_year: "This Year",
+                chart_interactive: "Interactive Chart Visualization",
+                bookings_title: "Room Registration Management",
+                btn_add_booking: "Add Registration",
+                th_reg_id: "Registration ID",
+                th_fees_paid: "Entry Fee (MYR)",
+                guests_title: "Student Directory",
+                btn_add_guest: "Add New Student",
+                th_student_id: "Student ID",
+                th_name: "Name",
+                th_contact: "Contact Details",
+                th_study_year: "Semester",
+                th_student_status: "Dorm Status",
+                study_year_1: "Semester 1",
+                study_year_2: "Semester 2",
+                study_year_3: "Semester 3",
+                study_year_4: "Semester 4",
+                study_year_5: "Semester 5",
+                badge_dorm_wajib: "Dorm (Mandatory)",
+                badge_dorm_pilihan: "Dorm (Optional)",
+                badge_dorm_luar_surat: "Outside Dorm (With Letter)",
+                badge_dorm_luar_no_surat: "Outside Dorm (NO LETTER!)",
+                badge_dorm_luar: "Outside Dorm",
+                badge_local_student: "Local Student",
+                badge_excellent_student: "Excellent Student",
+                badge_suspended: "Suspended",
+                rooms_title: "Dormitory Room Management",
+                btn_add_room: "Add Room",
+                sum_total_rooms: "Total Rooms: 172",
+                sum_available_rooms: "Available: 78",
+                sum_occupied_rooms: "Occupied: 82",
+                sum_cleaning_rooms: "Cleaning: 8",
+                sum_maintenance_rooms: "Maintenance: 4",
+                btn_all_status: "All Statuses",
+                btn_available: "Available",
+                btn_occupied: "Occupied",
+                btn_cleaning_tab: "Cleaning",
+                btn_maintenance_tab: "Maintenance",
+                btn_all_blocks: "All Blocks",
+                btn_block_a: "Block A",
+                btn_block_b: "Block B",
+                btn_block_c: "Block C",
+                room_prefix: "Room",
+                male: "Male",
+                female: "Female",
+                status_available_en: "Available",
+                type_single: "Single Bed",
+                smart_key_active: "Smart Key Active",
+                btn_set_occupied: "Set Occupied",
+                btn_set_available: "Set Available",
+                type_shared_2: "Shared Room (2 Beds)",
+                lbl_student: "Student",
+                type_shared_4: "Shared Room (4 Beds)",
+                lbl_cleaning_work: "Cleaning Work",
+                type_shared_6: "Shared Room (6 Beds)",
+                lbl_maintenance_work: "Maintenance Work",
+                type_warden: "Warden's Room",
+                lbl_warden: "Warden",
+                btn_set_available_en: "Set Available",
+                analytics_header: "Analytics & Business Intelligence",
+                opt_6_months: "Last 6 Months",
+                stat_total_earnings: "Total Earnings",
+                desc_compared_last_month: "Compared to last month",
+                stat_occupancy_rate: "Occupancy Rate",
+                desc_avg_30_days: "Average rate over 30 days",
+                stat_new_guests: "New Students",
+                desc_reg_this_month: "Registrations this month",
+                stat_direct_bookings: "Direct Bookings",
+                desc_via_portal: "Via SHMaaS portal",
+                revenue_trends_title: "Revenue Trends (MYR)",
+                occupancy_breakdown_title: "Room Occupancy Breakdown",
+                type_deluxe: "Deluxe Rooms",
+                lbl_occupied_lower: "occupied",
+                type_executive: "Executive Suites",
+                type_standard: "Standard Rooms",
+                type_shared: "Shared Dorms",
+                lbl_active_lower: "active",
+                staff_title: "Warden Management",
+                btn_add_staff: "Add New Warden",
+                role_senior_super: "Senior Supervisor & IT Admin",
+                status_on_duty: "On Shift",
+                role_warden_a: "Warden Block A",
+                role_warden_c: "Warden Block C",
+                status_off_duty: "Off Duty",
+                role_warden_b: "Warden Block B",
+                settings_title: "System Settings",
+                tab_general: "General Settings",
+                tab_booking: "Booking Policies",
+                tab_security: "Security & Access",
+                lbl_general_props: "General Properties",
+                lbl_hostel_name: "Hostel Name",
+                lbl_contact_email: "Contact Email",
+                lbl_address: "Address",
+                lbl_default_currency: "Default Currency",
+                btn_save_settings: "Save Settings",
+                lbl_booking_prefs: "Booking Preferences",
+                lbl_checkin_time: "Default Check-in Time",
+                lbl_checkout_time: "Default Check-out Time",
+                lbl_cancellation: "Cancellation Window",
+                opt_cancel_24: "24 hours before check-in (Free)",
+                opt_cancel_48: "48 hours before check-in (Free)",
+                opt_cancel_none: "Non-refundable",
+                lbl_auto_allocation: "Automatic Allocation",
+                lbl_auto_allocation_desc: "Enable AI room allocation on payment confirmation",
+                btn_save_policies: "Save Policies",
+                lbl_security_pwd: "Security & Password",
+                lbl_current_pwd: "Current Password",
+                lbl_new_pwd: "New Password",
+                ph_min_chars: "Min. 8 characters",
+                lbl_confirm_new_pwd: "Confirm New Password",
+                ph_retype_pwd: "Re-type new password",
+                btn_change_pwd: "Change Password",
+                lbl_add_item: "Add Item",
+                title_add_booking: "Add New Booking",
+                lbl_student_name: "Student Name",
+                lbl_student_email: "Student Email",
+                lbl_block_room_alloc: "Block & Room Allocation",
+                lbl_checkin: "Check-in Date",
+                lbl_checkout: "Check-out Date",
+                lbl_hostel_fees: "Hostel Fees (MYR)",
+                btn_save_booking: "Save Registration",
+                title_add_guest: "Add New Student",
+                lbl_phone: "Phone Number",
+                btn_save_student_record: "Save Student Record",
+                title_add_room: "Add New Room",
+                lbl_room_number: "Room Number",
+                lbl_room_type: "Room Type",
+                lbl_initial_status: "Initial Status",
+                type_shared_2_bed: "Shared 2-Bed",
+                type_shared_4_bed: "Shared 4-Bed",
+                type_shared_6_bed: "Shared 6-Bed",
+                btn_save_room: "Save Room",
+                title_add_staff: "Add Staff Member / Warden",
+                lbl_warden_name: "Warden Name",
+                lbl_warden_role: "Role / Assigned Block",
+                btn_save_staff: "Save Warden",
+                toast_saved_success: "Settings saved successfully!",
+                toast_logout: "Logging out..."
+            }
+        };
+
+        function setLanguage(lang) {
+            if (currentLanguage === lang) return;
+            currentLanguage = lang;
+            updateTranslations();
+            showToast(currentLanguage === 'ms' ? 'Bahasa ditukar kepada Bahasa Melayu' : 'Language switched to English', 'info');
+        }
+
+        function toggleLanguage() {
+            const nextLang = currentLanguage === 'ms' ? 'en' : 'ms';
+            setLanguage(nextLang);
+        }
+
+        function updateTranslations() {
+            // Translate all elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                el.textContent = getTranslation(key);
+            });
+
+            // Translate placeholders
+            document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-translate-placeholder');
+                el.placeholder = getTranslation(key);
+            });
+
+            // Translate titles/tooltips
+            document.querySelectorAll('[data-translate-title]').forEach(el => {
+                const key = el.getAttribute('data-translate-title');
+                el.title = getTranslation(key);
+            });
+
+            // Update language toggle buttons visual active state
+            const btnMs = document.getElementById('btn-lang-ms');
+            const btnEn = document.getElementById('btn-lang-en');
+            if (btnMs && btnEn) {
+                if (currentLanguage === 'ms') {
+                    btnMs.classList.add('active');
+                    btnEn.classList.remove('active');
+                } else {
+                    btnEn.classList.add('active');
+                    btnMs.classList.remove('active');
+                }
+            }
+        }
+
+        function getTranslation(key) {
+            return translations[currentLanguage][key] || translations['ms'][key] || '';
+        }
+
+        // Initialize translations on load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateTranslations();
+        });
+
+        function saveSettingsForm(e) {
+            e.preventDefault();
+            showToast(getTranslation('toast_saved_success'), 'success');
+        }
+
+        // Logout function
+        function logout() {
+            showToast(getTranslation('toast_logout'), 'info');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#6366f1'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.75rem;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Add animation keyframes dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Simulate real-time updates
+        setInterval(() => {
+            // Randomly update stats
+            const occupancy = document.querySelector('.stat-value');
+            if (occupancy && Math.random() > 0.7) {
+                const currentVal = parseInt(occupancy.textContent);
+                occupancy.textContent = (currentVal + (Math.random() > 0.5 ? 1 : -1)) + '%';
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

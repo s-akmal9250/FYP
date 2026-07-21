@@ -1,0 +1,117 @@
+/* 
+=========================================================================
+[KONEKSI ADMIN] - STYLES FOR ADMIN LOGIN PORTAL
+Gabungkan kod gaya CSS di bawah ke dalam fail CSS kawan anda
+untuk menyokong paparan modal log masuk (login) Admin.
+=========================================================================
+*/
+
+/* Pembolehubah Warna Lalai untuk Modal */
+:root {
+    --gradient-1: linear-gradient(135deg, #6366f1, #4f46e5);
+    --dark: #1e293b;
+    --light: #f1f5f9;
+    --white: #ffffff;
+    --gray: #64748b;
+    --danger: #ef4444;
+    --shadow: 0 4px 6px rgba(0,0,0,0.05);
+    --shadow-glow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* Butang Log Masuk Admin / Warden */
+.btn-login {
+    padding: 0.625rem 1.5rem;
+    background: var(--gradient-1);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+/* Modal Pop-up (Digunakan untuk Login Form Admin) */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-width: 450px;
+    width: 100%;
+    position: relative;
+    animation: modalSlide 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes modalSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Butang Tutup (Close Button Modal) */
+.close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: var(--gray);
+    transition: all 0.3s ease;
+}
+
+.close:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* Pengepala Modal (Modal Header) */
+.modal-header {
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.modal-header p {
+    color: var(--gray);
+    font-size: 0.95rem;
+}
